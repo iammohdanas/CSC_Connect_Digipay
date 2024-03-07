@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 import xmltodict
 from mainapp.components import bank_list, generate_msg_id, generate_txn_id
 from mainapp.txncomponents.withdrawformreq import withdraw_apireq
-from .connect import Connect
+from .connect import Connect, ProfileApi, generate_otp_function, new_mssg_api
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from .connect import Connect
 # Assuming connector is a custom class in your Django app
@@ -25,11 +25,46 @@ def process_login(request):
     if not code:
         return redirect('login')
     data = connector.second_call(code=code)
+    csc_id = data['User']['csc_id']
+    obj = ProfileApi()
+    user_data = obj.main(csc_id)
+    mobile_no = user_data['mobile']
+
+    # if request.method == 'POST':
+        
+    otp = generate_otp_function()   
+    new_mssg_api("8858045785", otp)
+    request.session['otp'] = otp
+    request.session['mobile'] = mobile_no
     context = {'bank_data':bank_list()}
     if isinstance(data, dict):
-        return render(request, 'transaction/transactionform.html',context)
+        return render(request, 'authentication/login_verify.html',context)
     else:
         return JsonResponse({"error": "Invalid data format"}, status=400)
+    
+def verify_otp(request):
+    if request.method == 'POST':
+        otp = int(request.POST.get('otp'))
+        print("otp",otp,"type",type(otp))
+        print("otp_session",request.session.get('otp'),"type",type(request.session.get('otp')))
+        if otp == request.session.get('otp'):
+            context = {
+                'bank_data':bank_list(),
+                'otp_verified': True,
+                'otp_verify_message': "OTP verification successful!",
+            }
+            return render(request, 'transaction/transactionform.html',context)  
+        else:
+            context = {
+                'otp_verified': False,
+                'otp_verify_message': "Invalid OTP. Please try again.",
+            }
+            return render(request, 'authentication/login_verify.html',context) 
+        print("context",context)
+    request.session['context_data']=context
+        
+    return HttpResponse("Error 404")  # Render the combined template for OTP verification form
+
 
 def process_withdrawform(request):
     configinput = {}

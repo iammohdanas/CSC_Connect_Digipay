@@ -21,3 +21,20 @@ class Transaction(models.Model):
     user_agent = models.TextField(blank=True, null=True, verbose_name="User Agent")
     transaction_fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, verbose_name="Transaction Fee")
     customer_reference_number = models.CharField(max_length=100, verbose_name="Customer Reference Number",null=True, unique=True)
+
+
+class DeviceFetch(models.Model):
+    port = models.CharField(max_length=10, primary_key=True)
+    status = models.CharField(max_length=20)
+    info = models.CharField(max_length=200)
+    method_capture = models.CharField(max_length=100)
+    # Add more fields as needed
+
+class DeviceAuth(models.Model):
+    csc_id = models.CharField(max_length=200, primary_key=True)
+    device_id = models.CharField(max_length=100)
+    port = models.ForeignKey(DeviceFetch, on_delete=models.CASCADE, related_name='authentications')
+    hmac = models.CharField(max_length=20)
+
+    # Add more fields as needed
+

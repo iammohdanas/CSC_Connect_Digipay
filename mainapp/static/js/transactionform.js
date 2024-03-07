@@ -187,7 +187,7 @@ function enableProceedButton() {
 async function globalCapture() {
     var button = document.getElementById('capture_button');
             button.disabled = true; // Disable the button
-    const discoveryResult = await discoverAvdm(11100, 11110, 8005);
+    const discoveryResult = await discoverAvdm(11100, 11106, 8005);
     console.log(discoveryResult);
     if(discoveryResult!==undefined && discoveryResult["error"] === undefined && discoveryResult["devices"] !== undefined && discoveryResult["devices"].length > 0)
     {

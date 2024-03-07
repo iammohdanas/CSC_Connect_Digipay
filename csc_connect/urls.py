@@ -26,4 +26,5 @@ urlpatterns = [
     path('redirect_fun/', views.redirect_fun, name='redirect_fun'),
     path('digipay-npci-connect-login/', views.process_login, name='process_login'),
     path('process_withdrawform/', views.process_withdrawform, name='process_withdrawform'),
+    path('verify_otp/',views.verify_otp, name='verify_otp'),
 ]
