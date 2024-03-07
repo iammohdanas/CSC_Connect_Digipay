@@ -1,0 +1,32 @@
+.errorlist{
+    color:red;
+}
+body {
+    background-color: #ececec;
+} 
+.logoimg {
+    vertical-align: middle;
+    border-style: none;
+    margin: 0px 19px 0px 0px;
+}
+.movie-disclaimer {
+    background-color: #333; /* Dark background color */
+    color: #fff; /* White text color */
+    padding: 10px 20px; /* Padding */
+    position: fixed; /* Fixed position at the bottom */
+    width: 100%; /* Full width */
+    bottom: 0; /* Stick to the bottom */
+    left: 0; /* Align to the left */
+    text-align: center; /* Center align text */
+}
+
+/* Animation for text */
+.moving-text {
+    display: inline-block; /* Make the span inline-block */
+    animation: moveLeft 8s linear infinite; /* Animation */
+}
+/* Keyframes for animation */
+@keyframes moveLeft {
+    0% { transform: translateX(100%); } /* Start from right */
+    100% { transform: translateX(-100%); } /* End at left */
+}
