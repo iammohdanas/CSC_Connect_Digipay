@@ -73,7 +73,7 @@ def process_login(request):
         print("in get method")
         if request.GET.get('code'):
             code = request.GET.get('code')
-            if not request.session.get("access_token--"):
+            if not request.session.get("second_call_data"):
                 print("in if")
                 data = connector.second_call(code=code)
                 print(data)
@@ -81,12 +81,15 @@ def process_login(request):
 
                 # print("access token",access_token)
                 # request.session["connect_data0"]=data[1]["access_token"]
-                request.session["access_token--"]=data
+                request.session["second_call_data"]=data
+                request.session["access_token"] = data[1]
                 
             else:
                 print("in else")
-                data=request.session.get("access_token--")
-                print("access_token",data)
+                data=request.session.get("second_call_data")
+                print("second_call_data",data)
+                access_token = request.session.get("access_token")
+                print("*********",access_token)
                 # request.session["access_token0"]=data
             # print("access token",access_token)
 
@@ -138,10 +141,10 @@ def verify_otp(request):
 def access_token_required(next_func):
     @wraps(next_func)
     def wrapper(request):
-        if request.session.get("access_token--") is not None:
-            return next(request)
+        if request.session.get("access_token") is not None:
+            return next_func(request)
         else:
-            return HttpResponse("Unauthorized", status=401)
+            return render(request, 'login.html')
     return wrapper
 
 
@@ -194,12 +197,14 @@ def process_withdrawform(request):
 def save_to_database(request):
     if request.method == 'POST':
         data = request.POST  # Assuming your JavaScript sends data as POST request
-
+        csc_id = request.POST.get('csc_id')
         port_number = request.POST.get('port')
+        hmac = request.POST.get('hmac')
+        device_id = request.POST.get('device_id')
         port_exists = DeviceAuth.objects.filter(port=port_number).exists()
         if not port_exists:
             # saving data to database
-            device = DeviceAuth.objects.create(
+            DeviceAuth.objects.create(
                 csc_id=data.get('httpStatus', False),
                 device_id=data.get('data', ''),
                 port=port_number,
@@ -207,9 +212,7 @@ def save_to_database(request):
             )
             return JsonResponse({'message': 'Data saved successfully'})
         else:
-            return JsonResponse({'message': 'Port number already exists'}, status=400)
-
+            return JsonResponse({'port_number': port_number}, status=400)
         # Optionally, you can return a JsonResponse to your JavaScript frontend
-        return JsonResponse({'message': 'Data saved successfully'})
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
