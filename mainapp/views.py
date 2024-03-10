@@ -3,6 +3,7 @@ from functools import wraps
 from django.shortcuts import redirect, render
 import xmltodict
 from mainapp.components import bank_list, generate_msg_id, generate_txn_id
+from mainapp.models import DeviceAuth
 from mainapp.txncomponents.withdrawformreq import withdraw_apireq
 from .connect import Connect, ProfileApi, generate_otp_function, new_mssg_api
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
@@ -20,28 +21,97 @@ def login(request):
 def redirect_fun(request):
     return redirect(connector.first_call())
 
-def process_login(request):
-    code = request.GET.get('code')
-    if not code:
-        return redirect('login')
-    data = connector.second_call(code=code)
-    csc_id = data['User']['csc_id']
-    obj = ProfileApi()
-    user_data = obj.main(csc_id)
-    mobile_no = user_data['mobile']
+# def process_login(request):
+#     code = request.GET.get('code')
+#     if not code:
+#         return redirect('login')
+#     data = connector.second_call(code=code)
+#     # print(data)
+#     print("data", data)
+#     print("access_token" ,data[1])
+#     csc_id = data[0]['User']['csc_id']
+#     obj = ProfileApi()
+#     user_data = obj.main(csc_id)
+#     mobile_no = user_data['mobile']
+#     otp = generate_otp_function()   
+#     new_mssg_api("8858045785", otp)
+#     request.session['otp'] = otp
+#     request.session['mobile'] = mobile_no
+#     context = {'bank_data':bank_list()}
+#     if isinstance(data, dict):
+#         return render(request, 'authentication/login_verify.html',context)
+#     else:
+#         return JsonResponse({"error": "Invalid data format"}, status=400)
 
-    # if request.method == 'POST':
+def process_login(request):
+    if request.method == 'POST':
+        # access_token=''
+        print("in post method")
+        otp = int(request.POST.get('otp'))
+        # print("otp",otp,"type",type(otp))
+        # print("otp_session",request.session.get('otp'),"type",type(request.session.get('otp')))
+        if otp == request.session.get('otp'):
+            # OTP is valid
+            
+            context = {
+                'otp_verified': True,
+                'otp_verify_message': "OTP verification successful!",
+            }
+            # return redirect('index.html')
+        else:
+            # OTP is invalid
+            context = {
+                'otp_verified': False,
+                'otp_verify_message': "Invalid OTP. Please try again.",
+            }
+        # print("context",context)
+        request.session['context_data']=context
         
-    otp = generate_otp_function()   
-    new_mssg_api("8858045785", otp)
-    request.session['otp'] = otp
-    request.session['mobile'] = mobile_no
-    context = {'bank_data':bank_list()}
-    if isinstance(data, dict):
+        # return redirect('welcome')  
         return render(request, 'authentication/login_verify.html',context)
-    else:
-        return JsonResponse({"error": "Invalid data format"}, status=400)
-    
+    elif request.method=="GET":
+        print("in get method")
+        if request.GET.get('code'):
+            code = request.GET.get('code')
+            if not request.session.get("access_token--"):
+                print("in if")
+                data = connector.second_call(code=code)
+                print(data)
+                # access_token=data
+
+                # print("access token",access_token)
+                # request.session["connect_data0"]=data[1]["access_token"]
+                request.session["access_token--"]=data
+                
+            else:
+                print("in else")
+                data=request.session.get("access_token--")
+                print("access_token",data)
+                # request.session["access_token0"]=data
+            # print("access token",access_token)
+
+            print("data",data)
+            
+            csc_id = data[0]['User']['csc_id']
+            obj = ProfileApi()
+            user_data = obj.main(csc_id)
+            mobile_no = user_data['mobile']
+            otp = generate_otp_function()   
+            new_mssg_api("7017528755", otp)
+            request.session['otp'] = otp
+            request.session['mobile'] = mobile_no
+            context = {
+                'otp_generated': True,
+                    'otp_sent_message': f"OTP sent to {mobile_no}.",
+                }
+            # return redirect("login_verify.html")
+            context = {
+                'otp_generated': False,
+                'otp_sent_message': 'error..!',
+            }
+            return render(request, 'authentication/login_verify.html', context)
+    return render(request, 'authentication/login_verify.html')
+
 def verify_otp(request):
     if request.method == 'POST':
         otp = int(request.POST.get('otp'))
@@ -63,9 +133,19 @@ def verify_otp(request):
         print("context",context)
     request.session['context_data']=context
         
-    return HttpResponse("Error 404")  # Render the combined template for OTP verification form
+    return HttpResponse("Error 404")
+
+def access_token_required(next_func):
+    @wraps(next_func)
+    def wrapper(request):
+        if request.session.get("access_token--") is not None:
+            return next(request)
+        else:
+            return HttpResponse("Unauthorized", status=401)
+    return wrapper
 
 
+@access_token_required
 def process_withdrawform(request):
     configinput = {}
     configinput2 ={}
@@ -111,3 +191,25 @@ def process_withdrawform(request):
     xml_response = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + xml_data
     return HttpResponse(xml_response, content_type="application/xml")
 
+def save_to_database(request):
+    if request.method == 'POST':
+        data = request.POST  # Assuming your JavaScript sends data as POST request
+
+        port_number = request.POST.get('port')
+        port_exists = DeviceAuth.objects.filter(port=port_number).exists()
+        if not port_exists:
+            # saving data to database
+            device = DeviceAuth.objects.create(
+                csc_id=data.get('httpStatus', False),
+                device_id=data.get('data', ''),
+                port=port_number,
+                hmac=data.get('status', ''),
+            )
+            return JsonResponse({'message': 'Data saved successfully'})
+        else:
+            return JsonResponse({'message': 'Port number already exists'}, status=400)
+
+        # Optionally, you can return a JsonResponse to your JavaScript frontend
+        return JsonResponse({'message': 'Data saved successfully'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)

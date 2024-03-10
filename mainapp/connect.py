@@ -45,7 +45,7 @@ class Connect:
             curl_command += ''.join([f""" -H "{key}: {value}" """ for key, value in headers.items()])
         if data:
             curl_command += f""" -d "{data}" """
-        print(curl_command)
+        # print(curl_command)
         curl_process = subprocess.Popen(curl_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         curl_output, curl_error = curl_process.communicate()
         try:
@@ -63,8 +63,8 @@ class Connect:
             'redirect_uri': self.redirect_uri,
             'state': state
         }
-        print("firstcall***************")
-        print(param)
+        # print("firstcall***************")
+        # print(param)
         x = [f"""{key}={value}""" for key, value in param.items()]
         redirect_url = f"""{url}?{'&'.join(x)}"""
         return redirect_url
@@ -79,22 +79,22 @@ class Connect:
             'client_id': self.client_id,
             'client_secret': secret_key
         }
-        print("_second_call******************")
+        # print("_second_call******************")
         data = '&'.join([f"{key}={value}" for key, value in params.items()])
         return self._make_curl_request("POST", url, headers={'Content-Type': 'application/x-www-form-urlencoded'}, data=data)
 
     def second_call(self, code):
-        res = self._second_call(code=code) 
-        print("second_call******************")
-        print(res)
+        res = self._second_call(code=code)
+        # print("second_call******************")
+        # print(res)
         if "access_token" in res:
             access_token = res["access_token"]
             url = f"{self.base_url}account/resource"
             headers = {'Authorization': f'Bearer {access_token}'}
-            return self._make_curl_request("GET", url, headers=headers)
+            return (self._make_curl_request("GET", url, headers=headers),{'access_token':access_token})
         else:
             return "No Access Token"
-        
+
 
 class ProfileApi:
     def __init__(self):
@@ -124,7 +124,7 @@ class ProfileApi:
             "client_ip": client_ip,
             "req_data": enc_data.decode('utf-8'),
         }
-        print("final data",final_data)
+        # print("final data",final_data)
         # http = urllib3.PoolManager()
         # headers = {'Content-Type': 'application/json'}
         # response = http.request('POST', url=self.url, body=json.dumps(final_data), headers=headers)
@@ -132,7 +132,7 @@ class ProfileApi:
         # print('response=',response,type(response))
         if response.stdout is not None:
             jdata = json.loads(response.stdout)
-            print('profile api reps=',jdata,'\n\n')
+            # print('profile api reps=',jdata,'\n\n')
             return jdata
         else:
             return {"error": "No response from subprocess"}
@@ -154,26 +154,26 @@ class ProfileApi:
         txn = self.generate_transaction_id()
         req_data = self.create_request_data(csc_id, txn, ts)
         response_data = self.profile_api_request(req_data)
-        print(response_data)
+        # print(response_data)
         if response_data['res_data'] != "NA":
             # try:
                 dec_data = response_data['res_data']
-                print("dec_data",dec_data,"\n\n")
+                # print("dec_data",dec_data,"\n\n")
                 obj= DataEncryption(self.key)
                 decp_data=obj.decrptFun(dec_data,1)
-                print("decp_data=",decp_data)
+                # print("decp_data=",decp_data)
                 response = self.filter_data_fun(decp_data)
                 return response
             # except Exception as e:
             #     return str(e) + ' ' + csc_id
         else:
             return None
-        
+
 
 def generate_otp_function():
     random_number = random.randint(100000, 999999)
     return random_number
-    
+
 def new_mssg_api(mobileNo,otp):
     url = "https://pgapi.vispl.in/fe/api/v1/send"
     param={"username":"cscotppg1.trans",
@@ -194,4 +194,4 @@ def new_mssg_api(mobileNo,otp):
 
     response = requests.request("POST", url, headers=headers, data=payload,params=param)
 
-    print("sms resp text",response.text)
+    # print("sms resp text",response.text)
