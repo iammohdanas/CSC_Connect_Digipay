@@ -1,0 +1,10 @@
+{
+    "Instruction": {
+      "points": [
+        "Enter the amount to be transferred to DSP Wallet",
+        "Read the consent carefully",
+        "Proceed for the authentication",
+        "After Successful Authentication, Click on Proceed."
+      ]
+    }
+  }

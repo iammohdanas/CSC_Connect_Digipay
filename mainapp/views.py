@@ -1,10 +1,12 @@
 from audioop import reverse
 from functools import wraps
+import json
+from pyexpat import XMLParserType
 from django.shortcuts import redirect, render
 import xmltodict
 from mainapp.components import bank_list, generate_msg_id, generate_txn_id
-from mainapp.models import DeviceAuth
-from mainapp.txncomponents.withdrawformreq import withdraw_apireq
+from mainapp.models import DeviceAuth,DeviceRegister
+from mainapp.txncomponents.withdrawformreq import RespPay, withdraw_apireq
 from .connect import Connect, ProfileApi, generate_otp_function, new_mssg_api
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from .connect import Connect
@@ -115,6 +117,7 @@ def process_login(request):
             return render(request, 'authentication/login_verify.html', context)
     return render(request, 'authentication/login_verify.html')
 
+
 def verify_otp(request):
     if request.method == 'POST':
         otp = int(request.POST.get('otp'))
@@ -122,11 +125,11 @@ def verify_otp(request):
         print("otp_session",request.session.get('otp'),"type",type(request.session.get('otp')))
         if otp == request.session.get('otp'):
             context = {
-                'bank_data':bank_list(),
                 'otp_verified': True,
                 'otp_verify_message': "OTP verification successful!",
             }
-            return render(request, 'transaction/transactionform.html',context)  
+            request.session['otpverifystatus'] = context
+            return redirect('transactionform')  
         else:
             context = {
                 'otp_verified': False,
@@ -147,6 +150,17 @@ def access_token_required(next_func):
             return render(request, 'login.html')
     return wrapper
 
+@access_token_required
+def transactionform(request):
+    aeps_service = ["Withdraw: Allows users to withdraw cash from their bank account using their Aadhaar number and fingerprint authentication.",
+                      "Deposit: Enables users to deposit cash into their bank account using Aadhaar authentication.", 
+                      "Mini statement: Provides a brief overview of recent transactions and account balance.",
+                      "Fund transfer: Facilitates the transfer of funds between bank accounts linked with Aadhaar authentication."]
+    context = {
+                'bank_data':bank_list(),
+                'aeps_service': aeps_service,
+            }
+    return render(request, 'transaction/transactionform.html', context)
 
 @access_token_required
 def process_withdrawform(request):
@@ -194,25 +208,64 @@ def process_withdrawform(request):
     xml_response = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + xml_data
     return HttpResponse(xml_response, content_type="application/xml")
 
-def save_to_database(request):
-    if request.method == 'POST':
-        data = request.POST  # Assuming your JavaScript sends data as POST request
-        csc_id = request.POST.get('csc_id')
-        port_number = request.POST.get('port')
-        hmac = request.POST.get('hmac')
-        device_id = request.POST.get('device_id')
-        port_exists = DeviceAuth.objects.filter(port=port_number).exists()
-        if not port_exists:
-            # saving data to database
-            DeviceAuth.objects.create(
-                csc_id=data.get('httpStatus', False),
-                device_id=data.get('data', ''),
-                port=port_number,
-                hmac=data.get('status', ''),
+
+def authdevregister(request):
+    DeviceRegister.objects.create(
+                device_name=request.POST.get('device_name'),
+                purpose=request.POST.get('input_purpose')
             )
-            return JsonResponse({'message': 'Data saved successfully'})
-        else:
-            return JsonResponse({'port_number': port_number}, status=400)
-        # Optionally, you can return a JsonResponse to your JavaScript frontend
+    return render(request, 'transaction/authregister.html')
+
+@access_token_required
+def walletTopup(request):
+    with open('mainapp/data/transaction/wallet_topup.json', 'r') as json_file:
+        data = json.load(json_file)
+    return render(request,'transaction/walletTopup.html',{'instruction_data': data} )
+
+def res_acquirer_ack(request):
+    dat={'ipAddr':'',
+         'acquirerId':'',
+         'switchType':'',
+         'msgType': '',
+         'ver':'',
+         'ipAddr': '127.0.0.1'        
+         }
+    rs = ''
+    if rs.get('curlHttp') == '200' and rs.get('curlErr') == 0 and rs.get('curlRes'):
+        rx = XMLParserType.decode(rs.get('curlRes', ''))
     else:
-        return JsonResponse({'error': 'Invalid request method'}, status=400)
+        rx = {
+        }
+    res = {
+        'refId': dat['refId'],
+        'acquirerId': dat['acquirerId'],
+        'switchType': dat['switchType'],
+        'msgType': dat['msgType'],
+        'ver': dat['ver'],
+        'api': rx.get('ns2:Ack_attr', {}).get('api'),
+        'reqMsgId': rx.get('ns2:Ack_attr', {}).get('reqMsgId'),
+        'ackTs': rx.get('ns2:Ack_attr', {}).get('ts'),
+        'curlErr': rx.get('curlErr'),
+        'errCode': rx.get('ns2:Ack', {}).get('errorMessages', {}).get('errorCd'),
+        'errMsg': rx.get('ns2:Ack', {}).get('errorMessages', {}).get('errorDtl'),
+        'ipAddr': dat['ipAddr']
+    }
+    if res['errCode'] is None:
+        res_code = '000'
+        res['txnStatus'] = 'SUCCESS'
+    else:
+        res_code = '003'
+        res['txnStatus'] = 'FAILED'
+        if len(res['errCode']) > 15:
+            res['errCode'] = 'UW'
+    
+    api_resp_data_context = RespPay(res)
+    context = {
+        **api_resp_data_context,
+    }
+    xml_data = xmltodict.unparse({"xml": context}, full_document=False)
+    return HttpResponse(xml_data, content_type="application/xml")
+
+
+
+

@@ -225,4 +225,76 @@ def withdraw_apireq(configinput, configinput2):
     return context
 
 
-
+def RespPay(res):
+    context = {
+                "ns2:RespPay": {
+                    "@xmlns:upi": "http://npci.org/upi/schema/",
+                    "Head": {
+                    "@ver": res['ver'],
+                    "@ts": res['ackTs'],
+                    "@orgId": "",
+                    "@msgId": "",
+                    "@prodType": "AEPS"
+                    },
+                    "Txn": {
+                    "@id": "",
+                    "@note": "Test",
+                    "@refId": res['refId'],
+                    "@custRef": "",
+                    "@refUrl": "",
+                    "@ts": "",
+                    "@purpose": "",
+                    "@type": "PAY|COLLECT|DEBIT|CREDIT|REVERSAL",
+                    "@subType": "",
+                    "@initiationMode": "",
+                    "@refCategory": "",
+                    "@orgTxnId": "",
+                    "@orgRrn": "",
+                    "@orgTxnDate": "",
+                    "@depositId": ""
+                    },
+                    "Resp": {
+                    "@reqMsgId": "",
+                    "@result": "",
+                    "@errCode": res['errCode'],
+                    "@actn": "",
+                    "@authCode": "",
+                    "Ref": [
+                        {
+                        "@type": "PAYEE",
+                        "@seqNum": "1",
+                        "@addr": "",
+                        "@regName": "",
+                        "@acNum": "",
+                        "@IFSC": "",
+                        "@code": "",
+                        "@accType": "",
+                        "@settAmount": "",
+                        "@orgAmount": "",
+                        "@settCurrency": "INR",
+                        "@approvalNum": "",
+                        "@respCode": "",
+                        "@reversalRespCode": ""
+                        },
+                        {
+                        "@type": "PAYER",
+                        "@seqNum": "1",
+                        "@addr": "",
+                        "@regName": "",
+                        "@acNum": "",
+                        "@IFSC": "",
+                        "@code": "",
+                        "@accType": "",
+                        "@settAmount": "",
+                        "@orgAmount": "",
+                        "@settCurrency": "INR",
+                        "@approvalNum": "",
+                        "@respCode": "",
+                        "@reversalRespCode": "",
+                        "@balAmt": ""
+                        }
+                    ]
+                    }
+                }
+            }
+    return context

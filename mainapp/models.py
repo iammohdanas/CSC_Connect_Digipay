@@ -25,16 +25,19 @@ class Transaction(models.Model):
 
 class DeviceFetch(models.Model):
     port = models.CharField(max_length=10, primary_key=True)
-    status = models.CharField(max_length=20)
-    info = models.CharField(max_length=200)
-    method_capture = models.CharField(max_length=100)
+    status = models.CharField(max_length=20,null=True)
+    info = models.CharField(max_length=200,null=True)
+    method_capture = models.CharField(max_length=100,null=True)
+    dc =  models.CharField(max_length=100,null=True)
+    mi = models.CharField(max_length=100,null=True)
     # Add more fields as needed
 
 class DeviceAuth(models.Model):
     csc_id = models.CharField(max_length=200, primary_key=True)
-    device_id = models.CharField(max_length=100)
-    port = models.ForeignKey(DeviceFetch, on_delete=models.CASCADE, related_name='authentications')
-    hmac = models.CharField(max_length=20)
+    device_id = models.CharField(max_length=100,null=True)
+    port = models.ForeignKey(DeviceFetch, on_delete=models.CASCADE, related_name='authentications',null=True)
+    hmac = models.CharField(max_length=20,null=True)
 
-    # Add more fields as needed
-
+class DeviceRegister(models.Model):
+    device_name = models.CharField(max_length=100,null=True)
+    purpose = models.CharField(max_length=300,null=True)
