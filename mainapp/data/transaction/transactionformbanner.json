@@ -1,0 +1,8 @@
+{
+    "Instruction": {
+        "aeps_service" : ["Withdraw: Allows users to withdraw cash from their bank account using their Aadhaar number and fingerprint authentication.",
+        "Deposit: Enables users to deposit cash into their bank account using Aadhaar authentication.", 
+        "Mini statement: Provides a brief overview of recent transactions and account balance.",
+        "Fund transfer: Facilitates the transfer of funds between bank accounts linked with Aadhaar authentication."]
+    }
+  }

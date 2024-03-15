@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+<body>
+{% block pagename %}
+  AEPS Logs
+{% endblock pagename %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/transaction/aepslogs.css' %}">
+<table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">S No.</th>
+        <th scope="col">Device Ref No</th>
+        <th scope="col">RRN</th>
+        <th scope="col">Date</th>
+        <th scope="col">Transaction Amount</th>
+        <th scope="col">Bank Name</th>
+        <th scope="col">Transaction Status</th>
+        <th scope="col">AEPS Status</th>
+        <th scope="col">Cust Mobile</th>
+        <th scope="col">Cust ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Add rows dynamically with your data here -->
+      <tr>
+        <td>1</td>
+        <td>ABC123</td>
+        <td>123456789</td>
+        <td>2024-03-15</td>
+        <td>$100.00</td>
+        <td>Example Bank</td>
+        <td>Success</td>
+        <td>Approved</td>
+        <td>9876543210</td>
+        <td>1232343434</td>
+      </tr>
+      <!-- Add more rows as needed -->
+    </tbody>
+  </table>
+<!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock content %}
+</body>
+</html>

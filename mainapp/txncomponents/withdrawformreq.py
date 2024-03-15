@@ -224,7 +224,6 @@ def withdraw_apireq(configinput, configinput2):
     }
     return context
 
-
 def RespPay(res):
     context = {
                 "ns2:RespPay": {

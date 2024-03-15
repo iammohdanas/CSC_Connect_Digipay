@@ -21,7 +21,9 @@
     <!-- navigation bar -->
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <img class="logoimg" src="{% static 'img\digitalindia.png' %}" alt="Digital Pay Logo" height="30">
-       
+       <span class="navbar-brand page-name" id="pagenameheading">
+        {% block pagename %} {% endblock pagename %}
+        </span>
         <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId"
             aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>

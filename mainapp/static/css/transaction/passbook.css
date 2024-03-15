@@ -1,0 +1,28 @@
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px;
+}
+.table-responsive {
+    overflow-x: auto;
+    border: 1px solid #dee2e6; /* Add border to the table container */
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%; /* Ensure table fills its container */
+}
+
+.table th
+{
+    border: 1px solid #dee2e6;
+    padding: 8px;
+}
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #aeb5bc;
+}
+.table th, .table td {
+    border: 1px solid #bebebe;
+    padding: 8px;
+}

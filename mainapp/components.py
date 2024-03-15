@@ -1,4 +1,5 @@
 import json
+import os
 import random
 import string
 import datetime
@@ -60,3 +61,9 @@ def generate_timestamp():
     timezone_offset = datetime.datetime.now(datetime.timezone.utc).astimezone().strftime('%z')
     formatted_timestamp = custom_datetime.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + timezone_offset
     return formatted_timestamp
+
+def get_client_ip_address():
+    if 'HTTP_X_FORWARDED_FOR' in os.environ:
+        return os.environ['HTTP_X_FORWARDED_FOR']
+    else:
+        return os.environ['REMOTE_ADDR']

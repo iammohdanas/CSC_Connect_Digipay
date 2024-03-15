@@ -1,21 +1,29 @@
 from audioop import reverse
+import datetime
 from functools import wraps
 import json
 from pyexpat import XMLParserType
+from xml.etree.ElementTree import XMLParser
 from django.shortcuts import redirect, render
+import requests
 import xmltodict
-from mainapp.components import bank_list, generate_msg_id, generate_txn_id
+from mainapp.components import bank_list, generate_msg_id, generate_txn_id, get_client_ip_address
+from mainapp.configdata.appconfig import ACQUIRERID, AEPS_VER, SWITCH_TYPE
 from mainapp.models import DeviceAuth,DeviceRegister
+from mainapp.txncomponents.wallet.wallet import wallet_req_action, wallet_request
+from mainapp.txncomponents.wallet.walletcomponents import fetch_bal_amt
 from mainapp.txncomponents.withdrawformreq import RespPay, withdraw_apireq
 from .connect import Connect, ProfileApi, generate_otp_function, new_mssg_api
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from .connect import Connect
+from .Encrypt import DataEncryption, aes_decrypt, aes_encrypt
 # Assuming connector is a custom class in your Django app
 
 client_id = "e0065bb4-b648-419b-e973-2e6e49552bd7"
 redirect_uri = "http://localhost:9000/digipay-npci-connect-login/"
 client_key = 's2gISpnceiVIWxbB'
 connector = Connect(client_id, redirect_uri, client_key)
+
 
 def login(request):
     return render(request, 'login.html')
@@ -44,6 +52,8 @@ def redirect_fun(request):
 #         return render(request, 'authentication/login_verify.html',context)
 #     else:
 #         return JsonResponse({"error": "Invalid data format"}, status=400)
+
+
 
 def process_login(request):
     if request.method == 'POST':
@@ -98,6 +108,8 @@ def process_login(request):
             print("data",data)
             
             csc_id = data[0]['User']['csc_id']
+            request.session['cscid'] = csc_id
+            request.session['owner'] = data[0]['User']['owner']
             obj = ProfileApi()
             user_data = obj.main(csc_id)
             mobile_no = user_data['mobile']
@@ -149,6 +161,10 @@ def access_token_required(next_func):
         else:
             return render(request, 'login.html')
     return wrapper
+
+@access_token_required
+def home(request):
+    return render(request,'home.html' )
 
 @access_token_required
 def transactionform(request):
@@ -216,19 +232,20 @@ def authdevregister(request):
             )
     return render(request, 'transaction/authregister.html')
 
-@access_token_required
-def walletTopup(request):
-    with open('mainapp/data/transaction/wallet_topup.json', 'r') as json_file:
-        data = json.load(json_file)
-    return render(request,'transaction/walletTopup.html',{'instruction_data': data} )
+
+
+def passbook(request):
+    return render(request,'transaction/passbook.html')
+
+def aepslogs(request):
+    return render(request,'transaction/aepslogs.html')
 
 def res_acquirer_ack(request):
-    dat={'ipAddr':'',
-         'acquirerId':'',
-         'switchType':'',
-         'msgType': '',
-         'ver':'',
-         'ipAddr': '127.0.0.1'        
+    dat={'ipAddr': get_client_ip_address(),
+         'acquirerId':ACQUIRERID,
+         'switchType':SWITCH_TYPE,
+         'msgType': 'ALIVE',
+         'ver':AEPS_VER,       
          }
     rs = ''
     if rs.get('curlHttp') == '200' and rs.get('curlErr') == 0 and rs.get('curlRes'):
@@ -242,12 +259,12 @@ def res_acquirer_ack(request):
         'switchType': dat['switchType'],
         'msgType': dat['msgType'],
         'ver': dat['ver'],
-        'api': rx.get('ns2:Ack_attr', {}).get('api'),
-        'reqMsgId': rx.get('ns2:Ack_attr', {}).get('reqMsgId'),
-        'ackTs': rx.get('ns2:Ack_attr', {}).get('ts'),
+        'api': rx.get('ns2:Ack_attr', {}).get('api') if rx else None,
+        'reqMsgId': rx.get('ns2:Ack_attr', {}).get('reqMsgId') if rx else None,
+        'ackTs': rx.get('ns2:Ack_attr', {}).get('ts') if rx else None,
         'curlErr': rx.get('curlErr'),
-        'errCode': rx.get('ns2:Ack', {}).get('errorMessages', {}).get('errorCd'),
-        'errMsg': rx.get('ns2:Ack', {}).get('errorMessages', {}).get('errorDtl'),
+        'errCode': rx.get('ns2:Ack', {}).get('errorMessages', {}).get('errorCd') if rx else None,
+        'errMsg': rx.get('ns2:Ack', {}).get('errorMessages', {}).get('errorDtl') if rx else None,
         'ipAddr': dat['ipAddr']
     }
     if res['errCode'] is None:
@@ -266,6 +283,27 @@ def res_acquirer_ack(request):
     xml_data = xmltodict.unparse({"xml": context}, full_document=False)
     return HttpResponse(xml_data, content_type="application/xml")
 
+@access_token_required
+def walletTopup(request):
+    with open('mainapp/data/transaction/wallet_topup.json', 'r') as json_file:
+        data = json.load(json_file)
+    return render(request,'transaction/walletTopup.html',{'instruction_data': data} )
 
+def wallet_topup_process(request):
+    configinputwallet = {}
+    configinputwallet['txnAmount'] = request.POST.get('wallettopupinputamount')
+    # configinputwallet['inp']['body']['txnAmount'] = request.POST.get('wallettopupinputamount')
+    configinputwallet['cscId'] = request.session.get("cscId")
+    configinputwallet['ownerId'] = request.session.get("owner")
+    # Create wallet request
+    wallet_req_data = wallet_request(configinputwallet, req_action='CREDIT') 
+    # Perform wallet action
+    response_data = wallet_req_action(wallet_req_data)
+    # Prepare JSON response
+    response = {
+        'response_data': response_data
+    }
+    print(response)
+    return JsonResponse(response)
 
 

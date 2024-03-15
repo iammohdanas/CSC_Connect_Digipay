@@ -64,7 +64,7 @@ class Connect:
             'state': state
         }
         # print("firstcall***************")
-        # print(param)
+        print(param)
         x = [f"""{key}={value}""" for key, value in param.items()]
         redirect_url = f"""{url}?{'&'.join(x)}"""
         return redirect_url
@@ -86,7 +86,7 @@ class Connect:
     def second_call(self, code):
         res = self._second_call(code=code)
         # print("second_call******************")
-        # print(res)
+        print(res)
         if "access_token" in res:
             access_token = res["access_token"]
             url = f"{self.base_url}account/resource"
@@ -124,12 +124,12 @@ class ProfileApi:
             "client_ip": client_ip,
             "req_data": enc_data.decode('utf-8'),
         }
-        # print("final data",final_data)
+        print("final data",final_data)
         # http = urllib3.PoolManager()
         # headers = {'Content-Type': 'application/json'}
         # response = http.request('POST', url=self.url, body=json.dumps(final_data), headers=headers)
         response=subprocess.run(["curl", "-X", "POST", "-H", f'Content-Type: application/json', "-d", f'{json.dumps(final_data)}', self.url], capture_output=True)
-        # print('response=',response,type(response))
+        print('response=',response,type(response))
         if response.stdout is not None:
             jdata = json.loads(response.stdout)
             # print('profile api reps=',jdata,'\n\n')
@@ -154,14 +154,14 @@ class ProfileApi:
         txn = self.generate_transaction_id()
         req_data = self.create_request_data(csc_id, txn, ts)
         response_data = self.profile_api_request(req_data)
-        # print(response_data)
+        print(response_data)
         if response_data['res_data'] != "NA":
             # try:
                 dec_data = response_data['res_data']
                 # print("dec_data",dec_data,"\n\n")
                 obj= DataEncryption(self.key)
                 decp_data=obj.decrptFun(dec_data,1)
-                # print("decp_data=",decp_data)
+                print("decp_data=",decp_data)
                 response = self.filter_data_fun(decp_data)
                 return response
             # except Exception as e:

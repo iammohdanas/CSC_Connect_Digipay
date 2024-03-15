@@ -7,21 +7,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Withdraw Form</title>
-<!-- Bootstrap CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="{% static 'css/transaction/wallet_topup.css' %}">
 </head>
 <body>
 {% block content %}
-
+<link rel="stylesheet" href="{% static 'css/transaction/wallet_topup.css' %}">
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8" style="margin-top: 50px;">
             <div class="card p-3 shadow">
-                <form id="withdrawForm" method="POST" action="{% url 'process_withdrawform' %}">
+                <form id="withdrawForm" method="POST" action="{% url 'walletTopupProcess' %}">
                     {% csrf_token %}
                     <div class="form-group" id="amountField">
                         <label for="amount">Amount</label>
-                        <input type="number" class="form-control" id="withdrawformamount" name="amount" placeholder="Enter amount" required>
+                        <input type="number" class="form-control" id="withdrawformamount" name="wallettopupinputamount" placeholder="Enter amount" required>
                         <small id="amountHelp" class="form-text text-muted">Enter the amount you want to Topup Wallet.</small>
                     </div>
                     
@@ -31,12 +31,10 @@
                         <button type="button" class="btn btn-secondary withdraw-btn" data-amount="1000" style="margin-left: 10px;">1000</button>
                         <button type="button" class="btn btn-secondary withdraw-btn" data-amount="2000" style="margin-left: 10px;">2000</button>
                     </div>
-                    
-
                     <br><br>
                     <div class="row">
                         &nbsp; &nbsp; <button type="button" id="capture_button" onclick="globalCapture()" class="btn btn-primary btn-authenticate">Authenticate</button> &nbsp; &nbsp; &nbsp; 
-                        <button type="submit" id="proceed_button" class="btn btn-primary btn-withdraw" disabled>Proceed</button>
+                        <button type="submit" id="proceed_button" class="btn btn-primary btn-withdraw" >Proceed</button>
                     </div>
                 </form>
             </div>
@@ -55,7 +53,8 @@
         </div>
     </div>
 </div>
-<script src="{% static 'js/walletTopup.js' %}"></script>
+<script src="{% static 'js/transaction/walletTopup.js' %}"></script>
+<script src="{% static 'js/bioauth.js' %}"></script>
 
 <!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

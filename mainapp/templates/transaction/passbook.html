@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+<body>
+{% block pagename %}
+  Passbook
+{% endblock pagename %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/transaction/passbook.css' %}">
+<table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Reference Number</th>
+        <th scope="col">Transaction amount</th>
+        <th scope="col">Wallet Balance</th>
+        <th scope="col">Transaction Type</th>
+        <th scope="col">Request Code</th>
+        <th scope="col">Date & Time</th>
+        <th scope="col">Remarks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Add rows dynamically with your data here -->
+      <tr>
+        <td>123456</td>
+        <td>$50</td>
+        <td>$1000</td>
+        <td>Debit</td>
+        <td>ABCD</td>
+        <td>2024-03-13 10:30:00</td>
+        <td>Transaction for groceries</td>
+      </tr>
+      <!-- Add more rows as needed -->
+    </tbody>
+  </table>
+<!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock content %}
+</body>
+</html>
