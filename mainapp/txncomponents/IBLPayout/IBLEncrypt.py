@@ -1,22 +1,16 @@
+import random
+import string
 import base64
-import json
 import os
-import requests
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
-from datetime import datetime
+import json
 
-APPNAME = 'DigiPay'
-
-WAL_URL = 'http://10.1.82.165/'
-WAL_CREDIT = 'digipay/credit'
-url = WAL_URL + WAL_CREDIT
-api_timeout = 90
+import requests
 
 def aes_encrypt(plain, key, a_key='J', enc_out='B64'):
     if a_key == 'J':
         plain = json.dumps(plain)
-    
     method = AES.MODE_CBC
     aes_key = base64.b64decode(key)
     iv = os.urandom(16)
@@ -27,7 +21,6 @@ def aes_encrypt(plain, key, a_key='J', enc_out='B64'):
         enc_dat = enc_data.hex()
     elif enc_out == 'B64':
         enc_dat = base64.b64encode(enc_data).decode()
-    
     return enc_dat
 
 def aes_decrypt(cipher, key, ret='J', enc_in='B64'):
@@ -36,12 +29,11 @@ def aes_decrypt(cipher, key, ret='J', enc_in='B64'):
     method = 'AES-256-CBC'
     cipher = AES.new(aes_key, AES.MODE_CBC, enc['iv'])
     dec_data = cipher.decrypt(enc['dat']).decode('utf-8').strip()
-    
     if ret == 'J':
         return json.loads(dec_data)
     else:
         return dec_data
-
+    
 def stat_split(enc, enc_in):
     if enc_in == 'HEX':
         enc_dat = bytes.fromhex(enc)
@@ -52,32 +44,38 @@ def stat_split(enc, enc_in):
     dat = enc_dat[16:]
     
     return {'iv': iv, 'dat': dat}
-payload = {
-        'head': {
-            'clientId': 'W01',
-            'appName': APPNAME,
-            'refId': '2302241653592001003000170157',
-            'ts': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-            'reqAction': 'credit',
-            'clientIp': '127.0.0.1'
-        },
-        # request body
-        'body': {
-            'cscId': '200100300017',
-            'dataSet': 'dgp',
 
-            'txnDate': datetime.now().strftime('%Y-%m-%d'),
-            
-        }
-    }
-req_dat = {
-        'clientId': 'W01',
-        'reqData': payload
-    }
-payload = json.dumps(req_dat)
-headers = {'Content-Type': 'application/json'}
 
-response = requests.post(url, data=payload, headers=headers, timeout=api_timeout, verify=False)
-response_json = response.text
+def generate_key(length=64):
+    characters = string.ascii_letters + string.digits
+    key = ''.join(random.choice(characters) for _ in range(length))
+    return key
 
-print(response_json)
+key = generate_key(length=32)
+
+shift = 3
+def encrypt_key(key, shift):
+    encrypted_key = ''
+    for char in key:
+        if char.isalpha():
+            if char.islower():
+                encrypted_key += chr((ord(char) - ord('a') + shift) % 26 + ord('a'))
+            else:
+                encrypted_key += chr((ord(char) - ord('A') + shift) % 26 + ord('A'))
+        else:
+            encrypted_key += char
+    return encrypted_key
+
+def decrypt_key(key, shift):
+    decrypted_key = ''
+    for char in key:
+        if char.isalpha():
+            if char.islower():
+                decrypted_key += chr((ord(char) - ord('a') - shift) % 26 + ord('a'))
+            else:
+                decrypted_key += chr((ord(char) - ord('A') - shift) % 26 + ord('A'))
+        else:
+            decrypted_key += char
+    return decrypted_key
+
+print(encrypt_key(key,shift))

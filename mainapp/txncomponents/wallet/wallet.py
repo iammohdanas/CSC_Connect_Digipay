@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 from mainapp.components import get_client_ip_address
-from mainapp.configdata.appconfig import API_VERBOSE, APPNAME, WAL_CLIENT, WAL_CREDIT, WAL_DEBIT, WAL_MINBALANCE, WAL_TIMEOUT, WAL_TOKEN, WAL_URL, ACQUIRERID
+from mainapp.configdata.appconfig import AEPS, API_VERBOSE, APPNAME, IBLDMT, WAL_CLIENT, WAL_CREDIT, WAL_DEBIT, WAL_MINBALANCE, WAL_TIMEOUT, WAL_TOKEN, WAL_URL, ACQUIRERID
 from mainapp.txncomponents.wallet.walletUtils import micro_service_config
 
 def wallet_request(configinputwallet, req_action):
@@ -23,7 +23,7 @@ def wallet_request(configinputwallet, req_action):
             'appName': APPNAME,
             'refId': 'deviceTxn',
             'ts': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-            'reqAction': 'credit',
+            'reqAction': 'CREDIT',
             'clientIp': 'get_client_ip_address()'
         },
         # request body
@@ -33,10 +33,10 @@ def wallet_request(configinputwallet, req_action):
             'dataSet': 'dgp',
             'isoRrn': "configinputwallet['custRef']",
             'txnAmount': configinputwallet['txnAmount'],
-            'remarks': ACQUIRERID + '- CUS:' + configinputwallet['custId'][-4:],
-            'refTxn': "configinputwallet['authorizeCode']" if 'authorizeCode' in configinputwallet else configinputwallet['deviceTxn'],
-            'txnSource': "configinputwallet['txnType']",
-            'reqCode': "configinputwallet['reqCode']",
+            'remarks': ACQUIRERID + '- CUS:' + IBLDMT['CUSTOMER_ID'][-4:],
+            'refTxn': "configinputwallet['authorizeCode']" if 'authorizeCode' in configinputwallet else "configinputwallet['deviceTxn']",
+            'txnSource': AEPS['CW_TXNTYPE'],
+            'reqCode': AEPS['CW_REQCODE'],
             'txnDate': datetime.now().strftime('%Y-%m-%d'),
             'minBalance': "configinputwallet['minBalance']" if 'minBalance' in configinputwallet else WAL_MINBALANCE
         }

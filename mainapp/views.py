@@ -10,6 +10,7 @@ import xmltodict
 from mainapp.components import bank_list, generate_msg_id, generate_txn_id, get_client_ip_address
 from mainapp.configdata.appconfig import ACQUIRERID, AEPS_VER, SWITCH_TYPE
 from mainapp.models import DeviceAuth,DeviceRegister
+from mainapp.txncomponents.IBLPayout.IBLPayout import process_IBL_txn
 from mainapp.txncomponents.wallet.wallet import wallet_req_action, wallet_request
 from mainapp.txncomponents.wallet.walletcomponents import fetch_bal_amt
 from mainapp.txncomponents.withdrawformreq import RespPay, withdraw_apireq
@@ -233,9 +234,8 @@ def authdevregister(request):
     return render(request, 'transaction/authregister.html')
 
 
-
-def passbook(request):
-    return render(request,'transaction/passbook.html')
+def aepspassbook(request):
+    return render(request,'transaction/aepspassbook.html')
 
 def aepslogs(request):
     return render(request,'transaction/aepslogs.html')
@@ -262,7 +262,7 @@ def res_acquirer_ack(request):
         'api': rx.get('ns2:Ack_attr', {}).get('api') if rx else None,
         'reqMsgId': rx.get('ns2:Ack_attr', {}).get('reqMsgId') if rx else None,
         'ackTs': rx.get('ns2:Ack_attr', {}).get('ts') if rx else None,
-        'curlErr': rx.get('curlErr'),
+        'curlErr': rx.get('curlErr') if rx else None,
         'errCode': rx.get('ns2:Ack', {}).get('errorMessages', {}).get('errorCd') if rx else None,
         'errMsg': rx.get('ns2:Ack', {}).get('errorMessages', {}).get('errorDtl') if rx else None,
         'ipAddr': dat['ipAddr']
@@ -307,3 +307,10 @@ def wallet_topup_process(request):
     return JsonResponse(response)
 
 
+# def initiate_payment(request):
+    
+#     data = process_IBL_txn()
+#     process_txn_api_url = 'https://indusapiuat.indusind.com/indusapi-np/uat/sync-apis/ISync/ProcessTxn'
+#     response = requests.post(process_txn_api_url, json=data)
+    
+#     return JsonResponse(response.json())

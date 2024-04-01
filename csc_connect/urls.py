@@ -30,8 +30,8 @@ urlpatterns = [
     path('transactionform/',views.transactionform,name='transactionform'),
     path('process_withdrawform/', views.process_withdrawform, name='process_withdrawform'),
     path('authdevregister/',views.authdevregister,name='authdevregister'),
-    path('passbook/',views.passbook,name='passbook'),
     path('aepslogs/',views.aepslogs,name='aepslogs'),
     path('walletTopup/',views.walletTopup,name='walletTopup'),
-    path('walletTopupProcess/',views.wallet_topup_process,name='walletTopupProcess')
+    path('walletTopupProcess/',views.wallet_topup_process,name='walletTopupProcess'),
+    path('aepspassbook/',views.aepspassbook,name='aepspassbook')
 ]
