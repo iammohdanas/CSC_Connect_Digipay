@@ -128,7 +128,7 @@ def verify_otp(request):
                 'otp_verify_message': "OTP verification successful!",
             }
             request.session['otpverifystatus'] = context
-            return redirect('authdevregister')  
+            return redirect('bioauthlogin')  
         else:
             context = {
                 'otp_verified': False,
@@ -256,12 +256,21 @@ def dashboarddigipay(request):
     context = {'vle_name':vle_name, 'csc_id':csc_id, 'current_month':current_month}
     return render(request,'dashboarddigipay.html',context)
 
-@access_token_required
 def base2(request):
     vle_name=request.session.get('vle_name')
     csc_id = request.session.get('cscid')
     context = {'vle_name':vle_name, 'csc_id':csc_id}
     return render(request,'base2.html',context)
+
+
+def baseauth(request):
+    vle_name=request.session.get('vle_name')
+    csc_id = request.session.get('cscid')
+    context = {'vle_name':vle_name, 'csc_id':csc_id}
+    return render(request,'baseauth.html',context)
+
+def bioauthlogin(request):
+    return render(request,'authentication/bioauthlogin.html')
 
 @access_token_required
 def aepstransaction(request):

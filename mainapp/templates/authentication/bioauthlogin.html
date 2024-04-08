@@ -1,10 +1,10 @@
-{% extends "base2.html" %}
+{% extends "baseauth.html" %}
 {% load static %}
 {% block page-content %}
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">BioAuth Device Registration</h1>
+        <h1 class="h3 mb-0 text-gray-800">Digipay Biometric Authentication</h1>
         <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                 class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> -->
     </div>
@@ -17,7 +17,7 @@
                 <!-- Card Header - Dropdown -->
                 <div
                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Transaction Form</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Existing Registered Device</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -35,7 +35,13 @@
                                 &nbsp; &nbsp; <button type="button" id="registerbioauth" class="btn btn-primary btn-withdraw" disabled>Authenticate VLE</button>
                                 &nbsp; &nbsp; <button type="submit" id="registerbioauth" class="btn btn-primary btn-withdraw" action=" ">Proceed</button>
 
-                            </div>                    
+                            </div>
+                            <br> 
+                            <div class="row">
+                                &nbsp; &nbsp; <a class="btn btn-primary" href="{% url 'dashboarddigipay' %}"  >Continue without Fingerprints</a>
+
+                            </div>      
+                                    
                         </form>
                     </div>
                 </div>
@@ -48,7 +54,7 @@
                 <!-- Card Header - Dropdown -->
                 <div
                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Register Device</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Register New Device</h6>
                     
                 </div>
                 <!-- Card Body -->

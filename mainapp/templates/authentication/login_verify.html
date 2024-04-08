@@ -1,4 +1,4 @@
-{% extends "base2.html" %}
+{% extends "baseauth.html" %}
 {% load static %}
 {% load static %}
 
@@ -6,24 +6,25 @@
 <div class="container-fluid">
 
     <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h2>Verify OTP</h2>
-    <form id="verifyOTPForm" method="POST" action="{% url 'verify_otp' %}">
-        {% csrf_token %}
-        <label for="otp">Enter OTP:</label><br>
-        <input type="text" id="otp" name="otp"><br><br>
-        <button type="submit" id="verifyOTP">Verify OTP</button>
-    </form>
-    <p id="verifyStatus"></p>
-        {% if otp_verified %}
-        <h1>OTP Verification</h1>
-        <p>{{ otp_verify_message }}</p>
-        {% else %}
-        <h1>OTP Verification</h1>
-        <p>{{ otp_verify_message }}</p>
-        {% endif %}
-    </div></div>
-    {% block jquery_script %}<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>{% endblock jquery_script %}
+    <div class="col-xl-3 col-md-6 mb-4">
+        <h4>Verify OTP</h4>
+        <div style="display: flex; justify-content: center;">
+            <form id="verifyOTPForm" method="POST" action="{% url 'verify_otp' %}" style="width: 300px;">
+                {% csrf_token %}
+                <input type="text" id="otp" name="otp" placeholder="Enter OTP"><br><br>
+                <div class="small" id="verifyStatus">
+                    {% if otp_verified %}
+                        {{ otp_verify_message }}
+                    {% else %}
+                        {{ otp_verify_message }}
+                    {% endif %}
+                </div>
+                <button class="btn btn-primary btn-scan" type="submit" id="verifyOTP">Verify OTP</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% block jquery_script %}<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>{% endblock jquery_script %}
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="{% static 'js/transactionform.js' %}"></script>
 <script src="{% static 'js/bioauth.js' %}"></script>

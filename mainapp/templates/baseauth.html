@@ -38,7 +38,8 @@
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-            <br>
+            
+            {% if csc_id %}
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'dashboarddigipay' %}">
@@ -115,26 +116,10 @@
                     <span>Logs</span>
                 </a>
             </li>
-
+            {% endif %}
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- More Components -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>More</span>
-                </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Additional Components:</h6>
-                        <a class="collapse-item" href="{% url 'authdevregister' %}">Register Auth Device</a>
-                        <a class="collapse-item" href="#">Help & Support</a>
-                    </div>
-                </div>
-            </li>
-
+            
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
@@ -150,7 +135,7 @@
 
         </ul>
         <!-- End of Sidebar -->
-
+        
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
@@ -165,6 +150,7 @@
                         <i class="fa fa-bars"></i>
                     </button>
 
+                    {% if csc_id %}
                     <!-- Topbar Search -->
                     <form
                         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
@@ -179,7 +165,6 @@
                         </div>
                     </form>
 
-                    {% if csc_id %}
                         <!-- Content to display when csc_id is present -->
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
@@ -359,6 +344,10 @@
                         </li>
 
                     </ul>
+                    {% else %}
+                        <h3>
+                            Authentication 
+                        </h3>
                     {% endif %}
 
 

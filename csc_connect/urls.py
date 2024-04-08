@@ -34,6 +34,8 @@ urlpatterns = [
     path('passbook/',views.passbook,name='passbook'),
     path('dashboard/',views.dashboarddigipay,name='dashboarddigipay'),
     path('base2/',views.base2,name='base2'),
+    path('baseauth/',views.baseauth,name='baseauth'),
     path('logout_user/',views.logout_user,name='logout_user'),
-    path('afterloginbioauth',views.afterloginbioauth,name='afterloginbioauth')
+    path('afterloginbioauth/',views.afterloginbioauth,name='afterloginbioauth'),
+    path('bioauthlogin/',views.bioauthlogin,name='bioauthlogin')
 ]
