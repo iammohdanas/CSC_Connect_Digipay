@@ -1,105 +1,148 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Withdraw Form</title>
-<!-- Bootstrap CSS -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-{% block content %}
+{% block page-content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">AEPS Transaction</h1>
+        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8" style="margin-top: 50px;">
-            <div class="card p-3 shadow">
-                <form id="withdrawForm" method="POST" action="{% url 'process_withdrawform' %}">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="transactionType">Transaction Type</label>
-                        <select class="form-control" id="withdrawformtransactionType" name="transactionType">
-                            <option value="">Select Transaction Type</option>
-                            <option value="22">Cash Withdrawal</option>
-                            <option value="23">Deposit</option>
-                            <option value="24">Fund Transfer</option>
-                            <option value="26">Mini Statement</option>
-                        </select>
+        <!-- Area Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div
+                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Transaction Form</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Dropdown Header:</div>
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
                     </div>
-                    <div class="form-group" id="bankOptionField" style="display:none;">
-                        <label for="bankOption">Bank Option</label>
-                        <select class="form-control" id="withdrawformbankOption" name="bankOption" required>
-                            <option value="select">Select Bank</option>
-                            {% for bank in bank_data %}
-                                <option value="{{ bank.ShortCode }}">{{ bank.BANK_NAME }}</option>
-                            {% endfor %}
-                        </select>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area" style="height: 40rem;">
+                        <form id="withdrawForm" method="POST" action="{% url 'process_withdrawform' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="transactionType">Transaction Type</label>
+                                <select class="form-control" id="withdrawformtransactionType" name="transactionType">
+                                    <option value="">Select Transaction Type</option>
+                                    <option value="22">Cash Withdrawal</option>
+                                    <option value="23">Deposit</option>
+                                    <option value="24">Fund Transfer</option>
+                                    <option value="26">Mini Statement</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="bankOptionField" style="display:none;">
+                                <label for="bankOption">Bank Option</label>
+                                <select class="form-control" id="withdrawformbankOption" name="bankOption" required>
+                                    <option value="select">Select Bank</option>
+                                    {% for bank in bank_data %}
+                                        <option value="{{ bank.ShortCode }}">{{ bank.BANK_NAME }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group" id="aadharNumberField" style="display:none;">
+                                <label for="aadharNumber">Aadhar Number</label>
+                                <input type="text" class="form-control" id="withdrawformaadharNumber" name="aadharNumber" placeholder="Enter Aadhar number" pattern="[0-9]{12}" maxlength="12" title="Enter 12-digit Aadhar Number" required>
+                                <small id="aadharNumberHelp" class="form-text text-muted">Enter 12-digits Aadhar Number.</small>
+                            </div>
+                            <div class="form-group" id="customerMobileNumberField" style="display:none;">
+                                <label for="customerMobileNumber">Customer Mobile Number</label>
+                                <input type="tel" class="form-control" id="withdrawformcustomerMobileNumber" name="customermobilenumber" placeholder="Enter mobile number" pattern="[6789][0-9]{9}" maxlength="10" oninput="enableAmountField()" required>
+                                <small id="mobileNumberHelp" class="form-text text-muted">You will receive otp on your registered Mobile Number</small>
+                                <small id="errorText" style="display: none; color: red;">
+                                    Please enter a valid Indian mobile number.
+                                </small>
+                            </div>
+                            <div class="form-group" id="amountField" >
+                                <label for="amount">Amount</label>
+                                <input type="number" class="form-control" id="withdrawformamount" name="amount" placeholder="Enter amount" required>
+                                <small id="amountHelp" class="form-text text-muted">Enter the amount you want to withdraw.</small>
+                            </div>
+                            
+                            <div class="row">
+                                &nbsp; &nbsp; <button type="button" id="capture_button" onclick="globalCapture()" class="btn btn-primary btn-authenticate">Authenticate</button> &nbsp; &nbsp; &nbsp; 
+                                <button type="submit" id="proceed_button" class="btn btn-primary btn-withdraw" disabled>Proceed</button>
+                            </div>
+                            <div id="authentication_message" style="display: none;"></div>
+                            <a class="nav-link" id="authdevregister" href="{% url 'authdevregister' %}" style="color: purple; font-style: italic; font-family:emoji;">Click Here to Register Bio Auth Device</a>
+        
+                            
+                            <div>
+                                    <textarea id="device_info" rows="4" cols="50" name="device_info" ></textarea>
+                                <br>
+                                    <textarea id="Pid Options" rows="4" cols="50" name="pid_options" ></textarea>
+                                <br>
+                                    <textarea id="Pid Data" rows="4" cols="50" name="pid_data" ></textarea>
+                            </div>
+                        </form>
                     </div>
-                    <div class="form-group" id="aadharNumberField" style="display:none;">
-                        <label for="aadharNumber">Aadhar Number</label>
-                        <input type="text" class="form-control" id="withdrawformaadharNumber" name="aadharNumber" placeholder="Enter Aadhar number" pattern="[0-9]{12}" maxlength="12" title="Enter 12-digit Aadhar Number" required>
-                        <small id="aadharNumberHelp" class="form-text text-muted">Enter 12-digits Aadhar Number.</small>
-                    </div>
-                    <div class="form-group" id="customerMobileNumberField" style="display:none;">
-                        <label for="customerMobileNumber">Customer Mobile Number</label>
-                        <input type="tel" class="form-control" id="withdrawformcustomerMobileNumber" name="customermobilenumber" placeholder="Enter mobile number" pattern="[6789][0-9]{9}" maxlength="10" oninput="enableAmountField()" required>
-                        <small id="mobileNumberHelp" class="form-text text-muted">You will receive otp on your registered Mobile Number</small>
-                        <small id="errorText" style="display: none; color: red;">
-                            Please enter a valid Indian mobile number.
-                        </small>
-                    </div>
-                    <div class="form-group" id="amountField" >
-                        <label for="amount">Amount</label>
-                        <input type="number" class="form-control" id="withdrawformamount" name="amount" placeholder="Enter amount" required>
-                        <small id="amountHelp" class="form-text text-muted">Enter the amount you want to withdraw.</small>
-                    </div>
-                    
-                    <div class="row">
-                        &nbsp; &nbsp; <button type="button" id="capture_button" onclick="globalCapture()" class="btn btn-primary btn-authenticate">Authenticate</button> &nbsp; &nbsp; &nbsp; 
-                        <button type="submit" id="proceed_button" class="btn btn-primary btn-withdraw" disabled>Proceed</button>
-                    </div>
-                    <div id="authentication_message" style="display: none;"></div>
-                    <a class="nav-link" id="authdevregister" href="{% url 'authdevregister' %}" style="color: purple; font-style: italic; font-family:emoji;">Click Here to Register Bio Auth Device</a>
-
-                    
-                    <div>
-                            <textarea id="device_info" rows="4" cols="50" name="device_info" ></textarea>
-                        <br>
-                            <textarea id="Pid Options" rows="4" cols="50" name="pid_options" ></textarea>
-                        <br>
-                            <textarea id="Pid Data" rows="4" cols="50" name="pid_data" ></textarea>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
-        <div class="col-md-4" style="margin-top: 50px;">
-            <div class="card p-3 shadow">
-                <div class="advertising-content">
-                    <h4>AEPS Services</h4>
-                    {% if aeps_service %}
-                        <ul>
-                            {% for point in aeps_service %}
-                                <li>{{ point }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>No content available.</p>
-                    {% endif %}
+
+        <!-- Pie Chart -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div
+                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Instructions</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Dropdown Header:</div>
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area" style="overflow-y: scroll; height: 40rem;">
+                            <h4>AEPS Services</h4>
+                            {% if aeps_service %}
+                                <ul>
+                                    {% for point in aeps_service %}
+                                        <li>{{ point }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No content available.</p>
+                            {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script>
-    
-</script>
 <!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
+{% block jquery_script %}<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>{% endblock jquery_script %}
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="{% static 'js/transactionform.js' %}"></script>
 <script src="{% static 'js/bioauth.js' %}"></script>
-{% endblock content %}
-</body>
-</html>
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+{% endblock page-content %}

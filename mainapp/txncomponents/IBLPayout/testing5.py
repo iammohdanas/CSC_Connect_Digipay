@@ -15,19 +15,15 @@ def generate_symmetric_key(key_size=256):
 
 
 data = {
-    'Customerid': '1234567890',
-    'Transaction Type': 'DEBIT',
-    'CustomerRefNumber': 'REF123',
-    'DebitAccountNo': '1234567890123',
-    'BeneficiaryName': 'John Doe',
-    'CreditAccountNumber': '9876543210987',
-    'BeneficiaryBankIFSCCode': 'INDU1234567',
-    'TransactionAmount': '100.00',
-    'Beneficiary Mobile Number': '9876543210',
-    'Email ID': 'vishal.hatiskar@indusind.com',
-    'Reserve1': '',
-    'Reserve2': '',
-    'Reserve3': '',
+    "Customerid": 30940094,
+    "TransactionType": "IMPS",
+    "CustomerRefNumber": "EL30150313GDAA",
+    "DebitAccountNo": "603014023791",
+    "BeneficiaryName": "ajay",
+    "CreditAccountNumber": "096598700000086",
+    "BeneficiaryBankIFSCCode": "YESB0000965",
+    "TransactionAmount": "1"
+
 }
 
 # Generate a random AES 256-bit symmetric key
@@ -44,7 +40,9 @@ def generate_aes_key():
     key = kdf.derive(password)
     return key
 
+
 random_aes_key = generate_aes_key()
+print(random_aes_key)
 symm_key = generate_symmetric_key()
 plaintext = json.dumps(data).encode('utf-8')
 # Encrypt payload with the generated key
@@ -61,9 +59,6 @@ def decrypt_payload(encrypted_payload, key):
 
 # decrypted_payload = decrypt_payload(encrypted_payload, random_aes_key)
 # print("Decrypted payload:", decrypted_payload)
-
-
-
 
 
 # Load your public certificate key
@@ -93,7 +88,7 @@ bmJIfMS8JWis0fdzPkCdPXWZvIY7OQ==
 
 # Load the public key from certificate
 public_key = load_pem_x509_certificate(public_key_pem.encode(), default_backend()).public_key()
-
+print(public_key)
 
 # Encrypt the AES key with RSA-OAEP-256 algorithm
 encrypted_key = jwe.encrypt(random_aes_key, public_key, algorithm='RSA-OAEP-256', encryption='A256GCM')
@@ -108,7 +103,6 @@ payload = {
 }
 
 print("\n\n\n{0}\n\n".format(payload))
-
 
 api_timeout=30
 def send_post_request(payload):

@@ -1,0 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+  }
+  
+  #container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    margin-top: 100px;
+    background-color: #f8f9fa; /* Background color for card 1 */
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  p {
+    margin-bottom: 10px;
+  }
+  
+  .highlight {
+    color: #f00;
+  }
+  
+  #container h1 {
+      color: #323232;
+  }
+  .card{
+      padding: 20px;
+      background: #f2f2f4;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+  }
+  .card-body{
+      background: linear-gradient(45deg, #ffffff, #c3c3c3);
+      padding: 13px;
+      border-radius: 5px;
+      margin: 10px;
+      border: 1px solid #dbdbdb;
+  }
+  #incomechart{
+    max-width: 80%; /* Limit image width to 100% of its container */
+    height: auto; /* Maintain aspect ratio */
+  }
+
+  

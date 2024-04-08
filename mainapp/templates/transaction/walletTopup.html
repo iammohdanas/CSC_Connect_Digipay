@@ -1,63 +1,109 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Withdraw Form</title>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<link rel="stylesheet" href="{% static 'css/transaction/wallet_topup.css' %}">
-</head>
-<body>
-{% block content %}
-<link rel="stylesheet" href="{% static 'css/transaction/wallet_topup.css' %}">
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8" style="margin-top: 50px;">
-            <div class="card p-3 shadow">
-                <form id="withdrawForm" method="POST" action="{% url 'walletTopupProcess' %}">
-                    {% csrf_token %}
-                    <div class="form-group" id="amountField">
-                        <label for="amount">Amount</label>
-                        <input type="number" class="form-control" id="withdrawformamount" name="wallettopupinputamount" placeholder="Enter amount" required>
-                        <small id="amountHelp" class="form-text text-muted">Enter the amount you want to Topup Wallet.</small>
+{% block page-content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Wallet Topup</h1>
+        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
+
+        <!-- Area Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div
+                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Transaction Form</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Dropdown Header:</div>
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
                     </div>
-                    
-                    <div class="btn-group" role="group" aria-label="Withdraw Buttons">
-                        <button type="button" class="btn btn-secondary withdraw-btn" data-amount="100">100</button>
-                        <button type="button" class="btn btn-secondary withdraw-btn" data-amount="500" style="margin-left: 10px;">500</button>
-                        <button type="button" class="btn btn-secondary withdraw-btn" data-amount="1000" style="margin-left: 10px;">1000</button>
-                        <button type="button" class="btn btn-secondary withdraw-btn" data-amount="2000" style="margin-left: 10px;">2000</button>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area" style="height: 30rem;">
+                        <form id="withdrawForm" method="POST" action="{% url 'walletTopupProcess' %}">
+                            {% csrf_token %}
+                            <div class="form-group" id="amountField">
+                                <label for="amount">Amount</label>
+                                <input type="number" class="form-control" id="withdrawformamount" name="wallettopupinputamount" placeholder="Enter amount" required>
+                                <small id="amountHelp" class="form-text text-muted">Enter the amount you want to Topup Wallet.</small>
+                            </div>
+                            
+                            <div class="btn-group" role="group" aria-label="Withdraw Buttons">
+                                <button type="button" class="btn btn-secondary withdraw-btn" data-amount="100">100</button>
+                                <button type="button" class="btn btn-secondary withdraw-btn" data-amount="500" style="margin-left: 10px;">500</button>
+                                <button type="button" class="btn btn-secondary withdraw-btn" data-amount="1000" style="margin-left: 10px;">1000</button>
+                                <button type="button" class="btn btn-secondary withdraw-btn" data-amount="2000" style="margin-left: 10px;">2000</button>
+                            </div>
+                            <br><br>
+                            <div class="row">
+                                &nbsp; &nbsp; <button type="button" id="capture_button" onclick="globalCapture()" class="btn btn-primary btn-authenticate">Authenticate</button> &nbsp; &nbsp; &nbsp; 
+                                <button type="submit" id="proceed_button" class="btn btn-primary btn-withdraw" >Proceed</button>
+                            </div>
+                        </form>
                     </div>
-                    <br><br>
-                    <div class="row">
-                        &nbsp; &nbsp; <button type="button" id="capture_button" onclick="globalCapture()" class="btn btn-primary btn-authenticate">Authenticate</button> &nbsp; &nbsp; &nbsp; 
-                        <button type="submit" id="proceed_button" class="btn btn-primary btn-withdraw" >Proceed</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
-        <div class="col-md-4" style="margin-top: 50px;">
-            <div class="card p-3 shadow">
-                <div class="advertising-content">
-                    <h4>Instructions</h4>
-                    <ul>
-                        {% for point in instruction_data.Instruction.points %}
-                            <li>{{ point }}</li>
-                        {% endfor %}
-                    </ul>
+
+        <!-- Pie Chart -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div
+                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Instructions</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Dropdown Header:</div>
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area" style="overflow-y: scroll; height: 30rem;">
+                        <h4>Instructions</h4>
+                        <ul>
+                            {% for point in instruction_data.Instruction.points %}
+                                <li>{{ point }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% block jquery_script %}<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>{% endblock jquery_script %}
+<!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
 <script src="{% static 'js/transaction/walletTopup.js' %}"></script>
 <script src="{% static 'js/bioauth.js' %}"></script>
-
 <!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-{% endblock content %}
-</body>
-</html>
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+{% endblock page-content %}

@@ -21,9 +21,7 @@ from mainapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.login, name='login'),
-    path('home/',views.home,name='home'),
-    # path('digipay-npci-connect-login/', views.dspLogin, name='login'),
+    path('',views.dashboarddigipay, name='dashboarddigipay'),
     path('redirect_fun/', views.redirect_fun, name='redirect_fun'),
     path('digipay-npci-connect-login/', views.process_login, name='process_login'),
     path('verify_otp/',views.verify_otp, name='verify_otp'),
@@ -33,5 +31,8 @@ urlpatterns = [
     path('aepslogs/',views.aepslogs,name='aepslogs'),
     path('walletTopup/',views.walletTopup,name='walletTopup'),
     path('walletTopupProcess/',views.wallet_topup_process,name='walletTopupProcess'),
-    path('aepspassbook/',views.aepspassbook,name='aepspassbook')
+    path('passbook/',views.passbook,name='passbook'),
+    path('dashboard/',views.dashboarddigipay,name='dashboarddigipay'),
+    path('base2/',views.base2,name='base2'),
+    path('logout_user/',views.logout_user,name='logout_user'),
 ]

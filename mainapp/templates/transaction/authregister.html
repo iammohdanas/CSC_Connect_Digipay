@@ -1,55 +1,111 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 {% load static %}
+{% block page-content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">BioAuth Device Registration</h1>
+        <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> -->
+    </div>
+    <!-- Content Row -->
+    <div class="row">
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Withdraw Form</title>
-<!-- Bootstrap CSS -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-{% block content %}
-
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-9" style="margin-top: 50px;">
-            <div class="card p-3 shadow">
-                <form id="withdrawForm" method="POST" action="{% url 'authdevregister' %}">
-                    {% csrf_token %}
-                    <div class="form-group" >
-                        <div class="col-md-9">
-                            <button type="button" id="scanButton" class="btn btn-primary btn-scan" style="    margin-left: 40%; width: 300px; margin-top: 8px;">Click to scan new Bio-Auth Devices</button>
+        <!-- Area Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div
+                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Transaction Form</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Dropdown Header:</div>
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
                         </div>
                     </div>
-                    <div class="form-group" >
-                        <label for="deviceName">Device Name</label>
-                        <input type="text" class="form-control" id="deviceName" name="device_name" placeholder="Enter device name" disabled>
-                        <small id="mobileNumberHelp" class="form-text text-muted">Minimun Characters Allowed : 6</small>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area" style="height: 30rem;">
+                        <form id="withdrawForm" method="POST" action="{% url 'authdevregister' %}">
+                            {% csrf_token %}
+                            <div class="form-group" >
+                                <div class="col-md-9">
+                                    <button type="button" id="scanButton" class="btn btn-primary btn-scan" style="    margin-left: 40%; width: 300px; margin-top: 8px;">Click to scan new Bio-Auth Devices</button>
+                                </div>
+                            </div>
+                            <div class="form-group" >
+                                <label for="deviceName">Device Name</label>
+                                <input type="text" class="form-control" id="deviceName" name="device_name" placeholder="Enter device name" disabled>
+                                <small id="mobileNumberHelp" class="form-text text-muted">Minimun Characters Allowed : 6</small>
+                            </div>
+        
+                            <div class="form-group">
+                                <label for="inputPurpose">Purpose</label>
+                                <textarea class="form-control" id="inputPurpose" name="input_purpose" placeholder="Enter input purpose"></textarea>
+                                <small id="mobileNumberHelp" class="form-text text-muted">Minimun Characters Allowed : 12</small>
+                            </div>
+                            
+                            <div class="row">
+                                &nbsp; &nbsp; <button type="submit" id="registerbioauth" class="btn btn-primary btn-withdraw" disabled>Register Device</button>
+                            </div>                    
+                        </form>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="form-group">
-                        <label for="inputPurpose">Purpose</label>
-                        <textarea class="form-control" id="inputPurpose" name="input_purpose" placeholder="Enter input purpose"></textarea>
-                        <small id="mobileNumberHelp" class="form-text text-muted">Minimun Characters Allowed : 12</small>
+        <!-- for new device registration -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div
+                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Instructions</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Dropdown Header:</div>
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
                     </div>
-                    
-                    <div class="row">
-                        &nbsp; &nbsp; <button type="submit" id="registerbioauth" class="btn btn-primary btn-withdraw" disabled>Register Device</button>
-                    </div>                    
-                </form>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area" style="overflow-y: scroll; height: 30rem;">
+                        <h4>Instructions</h4>
+                        <ul>
+                            {% for point in instruction_data.Instruction.points %}
+                                <li>{{ point }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
 </div>
-
+{% block jquery_script %}<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>{% endblock jquery_script %}
+<!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
+<script src="{% static 'js/transaction/walletTopup.js' %}"></script>
+<script src="{% static 'js/bioauth.js' %}"></script>
 <!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="{% static 'js/transaction/authregister.js' %}">
-</script>
-{% endblock content %}
-</body>
-</html>
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+{% endblock page-content %}

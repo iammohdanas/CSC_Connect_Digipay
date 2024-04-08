@@ -1,6 +1,9 @@
 from audioop import reverse
+import base64
 import datetime
+from datetime import datetime
 from functools import wraps
+from io import BytesIO
 import json
 from pyexpat import XMLParserType
 from xml.etree.ElementTree import XMLParser
@@ -17,7 +20,10 @@ from mainapp.txncomponents.withdrawformreq import RespPay, withdraw_apireq
 from .connect import Connect, ProfileApi, generate_otp_function, new_mssg_api
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from .connect import Connect
-from .Encrypt import DataEncryption, aes_decrypt, aes_encrypt
+import matplotlib.pyplot as plt
+import numpy as np
+from django.contrib.auth import logout
+from datetime import datetime, timedelta
 # Assuming connector is a custom class in your Django app
 
 client_id = "e0065bb4-b648-419b-e973-2e6e49552bd7"
@@ -27,7 +33,10 @@ connector = Connect(client_id, redirect_uri, client_key)
 
 
 def login(request):
-    return render(request, 'login.html')
+    if request.session.get("access_token") is not None:
+        return render(request, 'dashboard.html')
+    else:
+        return render(request, 'login.html')
 
 def redirect_fun(request):
     return redirect(connector.first_call())
@@ -96,7 +105,6 @@ def process_login(request):
                 # request.session["connect_data0"]=data[1]["access_token"]
                 request.session["second_call_data"]=data
                 request.session["access_token"] = data[1]
-                
             else:
                 print("in else")
                 data=request.session.get("second_call_data")
@@ -105,7 +113,6 @@ def process_login(request):
                 print("*********",access_token)
                 # request.session["access_token0"]=data
             # print("access token",access_token)
-
             print("data",data)
             
             csc_id = data[0]['User']['csc_id']
@@ -113,6 +120,9 @@ def process_login(request):
             request.session['owner'] = data[0]['User']['owner']
             obj = ProfileApi()
             user_data = obj.main(csc_id)
+            vle_name =user_data.get('vle_name')
+            request.session['vle_name']=vle_name
+            vle_name=request.session.get('vle_name')
             mobile_no = user_data['mobile']
             otp = generate_otp_function()   
             new_mssg_api("7017528755", otp)
@@ -130,6 +140,9 @@ def process_login(request):
             return render(request, 'authentication/login_verify.html', context)
     return render(request, 'authentication/login_verify.html')
 
+def process_logout(request):
+    request.session.pop('second_call_data')
+    return redirect('dashboarddigipay')  
 
 def verify_otp(request):
     if request.method == 'POST':
@@ -142,7 +155,7 @@ def verify_otp(request):
                 'otp_verify_message': "OTP verification successful!",
             }
             request.session['otpverifystatus'] = context
-            return redirect('transactionform')  
+            return redirect('dashboarddigipay')  
         else:
             context = {
                 'otp_verified': False,
@@ -166,6 +179,9 @@ def access_token_required(next_func):
 @access_token_required
 def home(request):
     return render(request,'home.html' )
+
+def login2(request):
+    return render(request, 'login2.html')
 
 @access_token_required
 def transactionform(request):
@@ -233,12 +249,53 @@ def authdevregister(request):
             )
     return render(request, 'transaction/authregister.html')
 
+@access_token_required
+def passbook(request):
+    return render(request,'transaction/passbook.html')
 
+@access_token_required
 def aepspassbook(request):
     return render(request,'transaction/aepspassbook.html')
 
+@access_token_required
 def aepslogs(request):
     return render(request,'transaction/aepslogs.html')
+
+@access_token_required
+def dashboard(request):
+    vle_name=request.session.get('vle_name')
+    csc_id = request.session.get('cscid')
+    context = {'vle_name':vle_name, 'csc_id':csc_id}
+    return render(request,'dashboard.html',context)
+
+@access_token_required
+def dashboardcsc(request):
+    vle_name=request.session.get('vle_name')
+    csc_id = request.session.get('cscid')
+    context = {'vle_name':vle_name, 'csc_id':csc_id}
+    return render(request,'dashboardcsc.html',context)
+
+@access_token_required
+def dashboarddigipay(request):
+    vle_name=request.session.get('vle_name')
+    csc_id = request.session.get('cscid')
+    current_month = datetime.now().strftime("%B")
+    context = {'vle_name':vle_name, 'csc_id':csc_id, 'current_month':current_month}
+    return render(request,'dashboarddigipay.html',context)
+
+@access_token_required
+def base2(request):
+    vle_name=request.session.get('vle_name')
+    csc_id = request.session.get('cscid')
+    context = {'vle_name':vle_name, 'csc_id':csc_id}
+    return render(request,'base2.html',context)
+
+@access_token_required
+def aepstransaction(request):
+    vle_name=request.session.get('vle_name')
+    csc_id = request.session.get('cscid')
+    context = {'vle_name':vle_name, 'csc_id':csc_id}
+    return render(request,'aepstransaction.html',context)
 
 def res_acquirer_ack(request):
     dat={'ipAddr': get_client_ip_address(),
@@ -314,3 +371,10 @@ def wallet_topup_process(request):
 #     response = requests.post(process_txn_api_url, json=data)
     
 #     return JsonResponse(response.json())
+
+def logout_user(request):
+    if request.method == 'GET':
+        logout(request)
+        return render(request, 'login.html', {'logged_out': True})
+    else:
+        return HttpResponse('Invalid request method', status=404)

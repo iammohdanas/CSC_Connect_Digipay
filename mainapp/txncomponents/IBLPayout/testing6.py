@@ -1,11 +1,71 @@
-from jose import jwe
+import os
+from jose.utils import base64url_encode
+import json
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from jose import jwe
+from cryptography.x509 import load_pem_x509_certificate
+import requests
 
-# AES symmetric key
-aes_key = "61a8e731186d0137ec349a3a3d16f1c4d453267686f37243e080b6a6b0e31aa2"
+# Generate a symmetric key
+def generate_symmetric_key(key_size=256):
+    key = os.urandom(key_size // 8)  # Generate random bytes
+    return base64url_encode(key)
 
-# Public key certificate
+
+data = {
+    'Customerid': '1234567890',
+    'Transaction Type': 'DEBIT',
+    'CustomerRefNumber': 'REF123',
+    'DebitAccountNo': '1234567890123',
+    'BeneficiaryName': 'John Doe',
+    'CreditAccountNumber': '9876543210987',
+    'BeneficiaryBankIFSCCode': 'INDU1234567',
+    'TransactionAmount': '100.00',
+    'Beneficiary Mobile Number': '9876543210',
+    'Email ID': 'vishal.hatiskar@indusind.com',
+    'Reserve1': '',
+    'Reserve2': '',
+    'Reserve3': '',
+}
+
+# Generate a random AES 256-bit symmetric key
+def generate_aes_key():
+    password = b"random"
+    salt = b"salt"
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=100000,
+        backend=default_backend()
+    )
+    key = kdf.derive(password)
+    return key
+
+
+random_aes_key = generate_aes_key()
+print("random aes",random_aes_key)
+symm_key = generate_symmetric_key()
+plaintext = json.dumps(data).encode('utf-8')
+# Encrypt payload with the generated key
+encrypted_payload = jwe.encrypt(plaintext,key=random_aes_key,algorithm='A256KW', encryption='A256GCM')
+
+# print("Encrypted payload:", encrypted_payload)
+
+def decrypt_payload(encrypted_payload, key):
+    decrypted_payload = jwe.decrypt(
+        encrypted_payload,
+        key=key
+    )
+    return json.loads(decrypted_payload.decode('utf-8'))
+
+# decrypted_payload = decrypt_payload(encrypted_payload, random_aes_key)
+# print("Decrypted payload:", decrypted_payload)
+
+
+# Load your public certificate key
 public_key_pem = """-----BEGIN CERTIFICATE-----
 MIIDojCCAoqgAwIBAgIIBmMSCJVcNv4wDQYJKoZIhvcNAQELBQAwOzELMAkGA1UE
 BhMCSU4xETAPBgNVBAoMCGluZHVzaW5kMRkwFwYDVQQDDBBpbmR1c2luZC1lbmMt
@@ -30,12 +90,44 @@ bmJIfMS8JWis0fdzPkCdPXWZvIY7OQ==
 -----END CERTIFICATE-----
 """
 
-print(public_key_pem)  # Print out the content of the PEM file
+# Load the public key from certificate
+public_key = load_pem_x509_certificate(public_key_pem.encode(), default_backend()).public_key()
+print(public_key)
 
-# Load public key from PEM format
-public_key = serialization.load_pem_public_key(public_key_pem.encode(), backend=default_backend())
+# Encrypt the AES key with RSA-OAEP-256 algorithm
+encrypted_key = jwe.encrypt(random_aes_key, public_key, algorithm='RSA-OAEP-256', encryption='A256GCM')
 
-# Encrypt AES key using RSA-OAEP-256
-jwe_token = jwe.encrypt(aes_key, public_key, algorithm='RSA-OAEP-256', encryption='A256GCM')
+# print("Encrypted AES Key:", encrypted_key.decode('utf-8'))
 
-print("Encrypted AES key:", jwe_token)
+
+payload = {
+    "data": encrypted_payload.decode('utf-8'),
+    "key": encrypted_key.decode('utf-8'),
+    "bit": 0,
+    "cache-control": "no-cache"
+}
+
+print("\n\n\n{0}\n\n".format(payload))
+
+api_timeout=30
+def send_post_request(payload):
+    headers = {
+        "IBL-Client-Id": "fce6de82afe45543d10849f5f3f6211c",
+        "IBL-Client-Secret": "30777c257ddc85059a7b5cc459ff5f93",
+        "Content-Type": "application/json"
+    }
+    api_url = 'https://indusapiuat.indusind.com/indusapi-np/uat/sync-apis/ISync/ProcessTxn'
+    try:
+        response = requests.post(api_url, headers=headers,timeout=api_timeout, data=payload)
+        response.raise_for_status()  # Raises exception for 4XX and 5XX status codes
+        return response.json()  # Assuming response is JSON
+    except requests.exceptions.RequestException as e:
+        print("\nError:", e)
+        return None
+
+response = send_post_request(payload)
+
+if response:
+    print("\nResponse:", response)
+
+
