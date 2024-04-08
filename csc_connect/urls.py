@@ -35,4 +35,5 @@ urlpatterns = [
     path('dashboard/',views.dashboarddigipay,name='dashboarddigipay'),
     path('base2/',views.base2,name='base2'),
     path('logout_user/',views.logout_user,name='logout_user'),
+    path('afterloginbioauth',views.afterloginbioauth,name='afterloginbioauth')
 ]

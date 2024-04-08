@@ -41,30 +41,6 @@ def login(request):
 def redirect_fun(request):
     return redirect(connector.first_call())
 
-# def process_login(request):
-#     code = request.GET.get('code')
-#     if not code:
-#         return redirect('login')
-#     data = connector.second_call(code=code)
-#     # print(data)
-#     print("data", data)
-#     print("access_token" ,data[1])
-#     csc_id = data[0]['User']['csc_id']
-#     obj = ProfileApi()
-#     user_data = obj.main(csc_id)
-#     mobile_no = user_data['mobile']
-#     otp = generate_otp_function()   
-#     new_mssg_api("8858045785", otp)
-#     request.session['otp'] = otp
-#     request.session['mobile'] = mobile_no
-#     context = {'bank_data':bank_list()}
-#     if isinstance(data, dict):
-#         return render(request, 'authentication/login_verify.html',context)
-#     else:
-#         return JsonResponse({"error": "Invalid data format"}, status=400)
-
-
-
 def process_login(request):
     if request.method == 'POST':
         # access_token=''
@@ -140,9 +116,6 @@ def process_login(request):
             return render(request, 'authentication/login_verify.html', context)
     return render(request, 'authentication/login_verify.html')
 
-def process_logout(request):
-    request.session.pop('second_call_data')
-    return redirect('dashboarddigipay')  
 
 def verify_otp(request):
     if request.method == 'POST':
@@ -155,7 +128,7 @@ def verify_otp(request):
                 'otp_verify_message': "OTP verification successful!",
             }
             request.session['otpverifystatus'] = context
-            return redirect('dashboarddigipay')  
+            return redirect('authdevregister')  
         else:
             context = {
                 'otp_verified': False,
@@ -164,8 +137,13 @@ def verify_otp(request):
             return render(request, 'authentication/login_verify.html',context) 
         print("context",context)
     request.session['context_data']=context
-        
     return HttpResponse("Error 404")
+
+def afterloginbioauth(request):
+    if request.session.get('otpverifystatus')==True:
+        return redirect('dashboarddigipay')
+    else:
+        return redirect('authdevregister') 
 
 def access_token_required(next_func):
     @wraps(next_func)
@@ -176,12 +154,7 @@ def access_token_required(next_func):
             return render(request, 'login.html')
     return wrapper
 
-@access_token_required
-def home(request):
-    return render(request,'home.html' )
 
-def login2(request):
-    return render(request, 'login2.html')
 
 @access_token_required
 def transactionform(request):
