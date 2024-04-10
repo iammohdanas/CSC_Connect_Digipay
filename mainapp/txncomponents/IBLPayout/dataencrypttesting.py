@@ -152,6 +152,6 @@ def send_post_request(data):
     
 
 # Sending the request
-response = send_post_request(data)
-if response:
-    print("\nResponse:", response)
+# response = send_post_request(data)
+# if response:
+#     print("\nResponse:", response)

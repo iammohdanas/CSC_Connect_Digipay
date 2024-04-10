@@ -24,18 +24,23 @@ class Transaction(models.Model):
 
 
 class DeviceFetch(models.Model):
-    port = models.CharField(max_length=10, primary_key=True)
+    id=models.AutoField(primary_key=True)
+    port = models.TextField()
     status = models.CharField(max_length=20,null=True)
     info = models.CharField(max_length=200,null=True)
-    method_capture = models.CharField(max_length=100,null=True)
-    dc =  models.CharField(max_length=100,null=True)
+    dc = models.CharField(max_length=100,null=True)
     mi = models.CharField(max_length=100,null=True)
+    mac = models.CharField(max_length=100,null=True)
+    csc_Id = models.CharField(max_length=100,null=True)
+    purpose = models.CharField(max_length=300,null=True)
     # Add more fields as needed
+    def __str__(self):
+        return f"DeviceFetch(id={self.id} ,port={self.port}, status={self.status}),info={self.info}, dc={self.dc},mi={self.mi},mac={self.mac},csc_id={self.csc_Id},purpose={self.purpose}"
 
 class DeviceAuth(models.Model):
     csc_id = models.CharField(max_length=200, primary_key=True)
     device_id = models.CharField(max_length=100,null=True)
-    port = models.ForeignKey(DeviceFetch, on_delete=models.CASCADE, related_name='authentications',null=True)
+    # port = models.ForeignKey(DeviceFetch, on_delete=models.CASCADE, related_name='authentications',null=True)
     hmac = models.CharField(max_length=20,null=True)
 
 class DeviceRegister(models.Model):

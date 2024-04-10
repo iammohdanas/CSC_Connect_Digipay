@@ -1,10 +1,11 @@
-{% extends "baseauth.html" %}
+{% extends "base2.html" %}
 {% load static %}
 {% block page-content %}
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Digipay Biometric Authentication</h1>
+        <small>Your Biometric Authentication device needs to be Registered to access this feature.</small>
         <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                 class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> -->
     </div>
@@ -27,13 +28,13 @@
                             
                             <div class="form-group" >
                                 <label for="deviceName">Device Name</label>
-                                <input type="text" class="form-control" id="deviceName" name="device_name" placeholder="Existing Device" disabled>
+                                <input type="text" class="form-control" id="deviceNameReg" name="device_name" placeholder="Existing Device" disabled>
                                 <small id="mobileNumberHelp" class="form-text text-muted">Minimun Characters Allowed : 6</small>
                             </div>
                             
                             <div class="row">
-                                &nbsp; &nbsp; <button type="button" id="registerbioauth" class="btn btn-primary btn-withdraw" disabled>Authenticate VLE</button>
-                                &nbsp; &nbsp; <button type="submit" id="registerbioauth" class="btn btn-primary btn-withdraw" action=" ">Proceed</button>
+                                &nbsp; &nbsp; <button type="button" id="registerbioauth" class="btn btn-primary btn-withdraw" onclick="capture_using_registered_device()" disabled>Authenticate VLE</button>
+                                &nbsp; &nbsp; <button type="submit" id="registerbioauth" class="btn btn-primary btn-withdraw" >Proceed</button>
 
                             </div>
                             <br> 
@@ -41,7 +42,16 @@
                                 &nbsp; &nbsp; <a class="btn btn-primary" href="{% url 'dashboarddigipay' %}"  >Continue without Fingerprints</a>
 
                             </div>      
-                                    
+                            <div>
+                                <!-- <label>AVDM / Device Info</label><br> -->
+                                    <textarea id="device_info" rows="4" cols="50" name="device_info" ></textarea>
+                                <br>
+                                <!-- <label>Pid Options</label><br> -->
+                                    <textarea id="Pid Options" rows="4" cols="50" name="pid_options" ></textarea>
+                                <br>
+                                <!-- <label>Pid Data</label><br> -->
+                                    <textarea id="Pid Data" rows="4" cols="50" name="pid_data" ></textarea>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -60,16 +70,16 @@
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="chart-area" style="height: 30rem;">
-                        <form id="withdrawForm" method="POST" action="{% url 'authdevregister' %}">
+                        <form id="withdrawForm" method="POST" action="{% url 'saveauthdb' %}">
                             {% csrf_token %}
                             <div class="form-group" >
                                 <div class="col-md-9">
-                                    <button type="button" id="scanButton" class="btn btn-primary btn-scan" style="margin-left: 25%; margin-right: 25%; width: 300px; margin-top: 8px;">Click to scan new Bio-Auth Devices</button>
+                                    <button type="button" id="scanButton" class="btn btn-primary btn-scan" style="margin-left: 25%; margin-right: 25%; width: 300px; margin-top: 8px;" onclick="globalCapture(start_port=11100, end_port=11106)">Click to scan new Bio-Auth Devices</button>
                                 </div>
                             </div>
                             <div class="form-group" >
                                 <label for="deviceName">Device Name</label>
-                                <input type="text" class="form-control" id="deviceName" name="device_name" placeholder="Enter device name" disabled>
+                                <input type="text" class="form-control" id="deviceName" name="device_name" placeholder="Enter device name" >
                                 <small id="mobileNumberHelp" class="form-text text-muted">Minimun Characters Allowed : 6</small>
                             </div>
         
@@ -80,8 +90,8 @@
                             </div>
                             
                             <div class="row">
-                                &nbsp; &nbsp; <button type="submit" id="registerbioauth" class="btn btn-primary btn-withdraw" disabled>Register Device</button>
-                            </div>                    
+                                &nbsp; &nbsp; <button type="submit" id="registerbioauth" class="btn btn-primary btn-withdraw" onclick="register_New_Device()" >Register Device</button>
+                            </div>              
                         </form>
                     </div>
                 </div>
@@ -89,6 +99,9 @@
         </div>
     </div>
 </div>
+
+
+
 {% block jquery_script %}<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>{% endblock jquery_script %}
 <!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
 <script src="{% static 'js/transaction/walletTopup.js' %}"></script>

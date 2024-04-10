@@ -118,9 +118,9 @@ def send_post_request(payload):
         print("\nError:", e)
         return None
 
-response = send_post_request(payload)
+# response = send_post_request(payload)
 
-if response:
-    print("\nResponse:", response)
+# if response:
+#     print("\nResponse:", response)
 
 

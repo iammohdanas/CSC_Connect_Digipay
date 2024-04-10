@@ -12,7 +12,7 @@ import requests
 import xmltodict
 from mainapp.components import bank_list, generate_msg_id, generate_txn_id, get_client_ip_address
 from mainapp.configdata.appconfig import ACQUIRERID, AEPS_VER, SWITCH_TYPE
-from mainapp.models import DeviceAuth,DeviceRegister
+from mainapp.models import DeviceAuth, DeviceFetch,DeviceRegister
 from mainapp.txncomponents.IBLPayout.IBLPayout import process_IBL_txn
 from mainapp.txncomponents.wallet.wallet import wallet_req_action, wallet_request
 from mainapp.txncomponents.wallet.walletcomponents import fetch_bal_amt
@@ -128,7 +128,7 @@ def verify_otp(request):
                 'otp_verify_message': "OTP verification successful!",
             }
             request.session['otpverifystatus'] = context
-            return redirect('bioauthlogin')  
+            return redirect('dashboarddigipay')  
         else:
             context = {
                 'otp_verified': False,
@@ -154,17 +154,17 @@ def access_token_required(next_func):
             return render(request, 'login.html')
     return wrapper
 
-
-
 @access_token_required
 def transactionform(request):
     aeps_service = ["Withdraw: Allows users to withdraw cash from their bank account using their Aadhaar number and fingerprint authentication.",
                       "Deposit: Enables users to deposit cash into their bank account using Aadhaar authentication.", 
                       "Mini statement: Provides a brief overview of recent transactions and account balance.",
                       "Fund transfer: Facilitates the transfer of funds between bank accounts linked with Aadhaar authentication."]
+    device_exists = DeviceFetch.objects.exists()
     context = {
                 'bank_data':bank_list(),
                 'aeps_service': aeps_service,
+                'device_exists':device_exists
             }
     return render(request, 'transaction/transactionform.html', context)
 
@@ -216,15 +216,20 @@ def process_withdrawform(request):
 
 
 def authdevregister(request):
-    DeviceRegister.objects.create(
-                device_name=request.POST.get('device_name'),
-                purpose=request.POST.get('input_purpose')
-            )
-    return render(request, 'transaction/authregister.html')
+    auth_reg_instructions = ["Click on Scan New Devices",
+                            "The Device will be fetched and displayed", 
+                            "Once the Device gets diplayed, Enter your purpose for new device registration",
+                            "Click Register button to register new device."]
+    device_exists = DeviceFetch.objects.exists()
+    context = {
+        'auth_reg_instructions' : auth_reg_instructions, 'device_exists':device_exists
+    }
+    return render(request, 'transaction/authregister.html',context)
 
 @access_token_required
 def passbook(request):
-    return render(request,'transaction/passbook.html')
+    device_exists = DeviceFetch.objects.exists()
+    return render(request,'transaction/passbook.html',{'device_exists':device_exists})
 
 @access_token_required
 def aepspassbook(request):
@@ -232,7 +237,8 @@ def aepspassbook(request):
 
 @access_token_required
 def aepslogs(request):
-    return render(request,'transaction/aepslogs.html')
+    device_exists = DeviceFetch.objects.exists()
+    return render(request,'transaction/aepslogs.html',{'device_exists':device_exists})
 
 @access_token_required
 def dashboard(request):
@@ -253,15 +259,16 @@ def dashboarddigipay(request):
     vle_name=request.session.get('vle_name')
     csc_id = request.session.get('cscid')
     current_month = datetime.now().strftime("%B")
-    context = {'vle_name':vle_name, 'csc_id':csc_id, 'current_month':current_month}
+    device_exists = DeviceFetch.objects.exists()
+    context = {'vle_name':vle_name, 'csc_id':csc_id, 'current_month':current_month,'device_exists':device_exists}
     return render(request,'dashboarddigipay.html',context)
 
 def base2(request):
     vle_name=request.session.get('vle_name')
     csc_id = request.session.get('cscid')
-    context = {'vle_name':vle_name, 'csc_id':csc_id}
+    device_exists = DeviceFetch.objects.exists()
+    context = {'vle_name':vle_name, 'csc_id':csc_id, 'device_exists':device_exists}
     return render(request,'base2.html',context)
-
 
 def baseauth(request):
     vle_name=request.session.get('vle_name')
@@ -270,12 +277,14 @@ def baseauth(request):
     return render(request,'baseauth.html',context)
 
 def bioauthlogin(request):
-    return render(request,'authentication/bioauthlogin.html')
+    device_exists = DeviceFetch.objects.exists()
+    return render(request,'authentication/bioauthlogin.html',{'device_exists':device_exists})
 
 @access_token_required
 def aepstransaction(request):
     vle_name=request.session.get('vle_name')
     csc_id = request.session.get('cscid')
+    
     context = {'vle_name':vle_name, 'csc_id':csc_id}
     return render(request,'aepstransaction.html',context)
 
@@ -326,7 +335,8 @@ def res_acquirer_ack(request):
 def walletTopup(request):
     with open('mainapp/data/transaction/wallet_topup.json', 'r') as json_file:
         data = json.load(json_file)
-    return render(request,'transaction/walletTopup.html',{'instruction_data': data} )
+    device_exists = DeviceFetch.objects.exists()
+    return render(request,'transaction/walletTopup.html',{'instruction_data': data,'device_exists':device_exists} )
 
 def wallet_topup_process(request):
     configinputwallet = {}
@@ -356,7 +366,51 @@ def wallet_topup_process(request):
 
 def logout_user(request):
     if request.method == 'GET':
+        
         logout(request)
         return render(request, 'login.html', {'logged_out': True})
     else:
         return HttpResponse('Invalid request method', status=404)
+    
+def saveauthdb(request):
+    # data = json.loads(request.body)
+    csc_id = request.session.get('csc_Id')
+    # mac_address = data.get('mac_address')
+    # ports = data['dev_infos']['ports']
+    # ports_int = [int(port) for port in ports]
+    csc_Id=csc_id,
+    port=8080,
+    status='okay',
+    info='Ready',
+    mi='dummy mi',
+    dc='dummy dc',
+    mac='dummy mac_address',
+    purpose='testing2'
+    device_exists = DeviceFetch.objects.exists()
+    device, created = DeviceFetch.objects.get_or_create(
+            id=1,  # Assuming there is only one entry in the table, so we use a fixed id
+            defaults={
+                'port': port,
+                'status': status,
+                'info': info,
+                'dc': dc,
+                'mi': mi,
+                'mac': mac,
+                'csc_Id': csc_id,
+                'purpose': purpose
+            }
+        )
+
+        # If the entry already existed, update its values with the new ones
+    if not created:
+        device.port = port
+        device.status = status
+        device.info = info
+        device.dc = dc
+        device.mi = mi
+        device.mac = mac
+        device.csc_Id = csc_id
+        device.purpose = purpose
+        device.save()
+        return HttpResponse('updated {0}'.format(device_exists), status = 200)
+    return HttpResponse('created', status = 200)

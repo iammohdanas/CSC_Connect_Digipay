@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 
 from mainapp import views
+from mainapp.txncomponents.bio_auth_reg import register_or_update_device_api, registered_device_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,5 +38,8 @@ urlpatterns = [
     path('baseauth/',views.baseauth,name='baseauth'),
     path('logout_user/',views.logout_user,name='logout_user'),
     path('afterloginbioauth/',views.afterloginbioauth,name='afterloginbioauth'),
-    path('bioauthlogin/',views.bioauthlogin,name='bioauthlogin')
+    path('bioauthlogin/',views.bioauthlogin,name='bioauthlogin'),
+    path('register_or_update_device_api/',register_or_update_device_api, name='register_or_update_device_api'),
+    path('registered_device_api/',registered_device_api, name='registered_device_api'),
+    path('saveauthdb/',views.saveauthdb, name='saveauthdb'),
 ]

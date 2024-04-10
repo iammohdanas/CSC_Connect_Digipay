@@ -6,21 +6,31 @@
 <div class="container-fluid">
 
     <!-- Page Heading -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <h4>Verify OTP</h4>
-        <div style="display: flex; justify-content: center;">
-            <form id="verifyOTPForm" method="POST" action="{% url 'verify_otp' %}" style="width: 300px;">
-                {% csrf_token %}
-                <input type="text" id="otp" name="otp" placeholder="Enter OTP"><br><br>
-                <div class="small" id="verifyStatus">
-                    {% if otp_verified %}
-                        {{ otp_verify_message }}
-                    {% else %}
-                        {{ otp_verify_message }}
-                    {% endif %}
+   
+    <div class="col-xl-8 col-lg-7" style="max-width: 100%;">
+        <div class="card shadow mb-4" style="height:20rem">
+            <!-- Card Header - Dropdown -->
+            <div
+                class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">OTP Verification</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-area" style="height: 30rem;">
+                    <form id="verifyOTPForm" method="POST" action="{% url 'verify_otp' %}" style="width: 300px;">
+                        {% csrf_token %}
+                        <input type="text" id="otp" name="otp" placeholder="Enter OTP" style="margin-top: 20px;"><br><br>
+                        <div class="small" id="verifyStatus" style="color: rgb(121, 12, 12); margin-bottom: 10px;">
+                            {% if otp_verified %}
+                                {{ otp_verify_message }}
+                            {% else %}
+                                {{ otp_verify_message }}
+                            {% endif %}
+                        </div>
+                        <button class="btn btn-primary btn-scan" type="submit" id="verifyOTP">Verify OTP</button>
+                    </form>
                 </div>
-                <button class="btn btn-primary btn-scan" type="submit" id="verifyOTP">Verify OTP</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
