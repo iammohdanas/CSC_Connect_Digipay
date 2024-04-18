@@ -10,8 +10,8 @@ document.addEventListener("DOMContentLoaded", function() {
     var mobileInput = document.getElementById("withdrawformcustomerMobileNumber");
     var amountInput =  document.getElementById("withdrawformamount");
     var deviceinfo =  document.getElementById("device_info");
-    var pidOptions =  document.getElementById("Pid Options");
-    var pidData =  document.getElementById("Pid Data");
+    var pidOptions =  document.getElementById("Pid_Options");
+    var pidData =  document.getElementById("Pid_Data");
 
     deviceinfo.style.display = "none";
     pidOptions.style.display = "none";

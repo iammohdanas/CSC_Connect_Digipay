@@ -101,9 +101,13 @@ def process_login(request):
             vle_name =user_data.get('vle_name')
             request.session['vle_name']=vle_name
             vle_name=request.session.get('vle_name')
+            agent_id=user_data.get('agent_id')
+            request.session['agent_id']=agent_id
+            terminal_id=user_data.get('terminal_id')
+            request.session['terminal_id']=terminal_id
             mobile_no = user_data['mobile']
             otp = generate_otp_function()   
-            new_mssg_api("7017528755", otp)
+            new_mssg_api("8858045785", otp)
             request.session['otp'] = otp
             request.session['mobile'] = mobile_no
             context = {
@@ -180,8 +184,8 @@ def process_withdrawform(request):
         configinput["txn_amount"] = request.POST.get('amount')
         configinput["bank_shortcode"] = request.POST.get('bankOption')
         configinput["transaction_type"] = request.POST.get('transactionType', None)
-        pidOptions = request.POST.get('pid_options')
-        pidData = request.POST.get('pid_data')
+        pidOptions = request.POST.get('Pid_Options')
+        pidData = request.POST.get('Pid_Data')
         device_info = request.POST.get('device_info')
         print("deviceInfoFingerprint******************")
 
@@ -202,8 +206,21 @@ def process_withdrawform(request):
     txn_id = generate_txn_id(request)   
     msg_id = generate_msg_id(request)
     configinput2["txnId"] = txn_id
+    request.session['txn_id'] = configinput2["txnId"]
     configinput2["msgId"] = msg_id
     configinput2["callbackEndpointIP"] = "127.0.0.1"
+    request.session['aadhar_number'] = configinput["aadhar_number"]
+    print("aadhar_number",request.session.get('aadhar_number'))
+    request.session['txn_amount']= configinput["txn_amount"]
+    current_local_time = datetime.now()
+    offset_seconds = -time.timezone if (time.localtime().tm_isdst == 0) else -time.altzone
+    offset_hours = offset_seconds // 3600
+    offset_minutes = (offset_seconds % 3600) // 60
+    offset_str = "{:02d}:{:02d}".format(abs(offset_hours), abs(offset_minutes))
+    offset_str = ("+" if offset_hours >= 0 else "-") + offset_str
+    configinput2["ts"] = current_local_time.strftime('%Y-%m-%dT%H:%M:%S') + offset_str
+    request.session['ts'] = configinput2["ts"]
+   
 
     api_req_data_context = withdraw_apireq(configinput, configinput2)
     context = {
@@ -429,101 +446,75 @@ def logout_user(request):
     else:
         return HttpResponse('Invalid request method', status=404)
     
-def saveauthdb(request):
-    # data = json.loads(request.body)
-    csc_id = request.session.get('csc_Id')
-    # mac_address = data.get('mac_address')
-    # ports = data['dev_infos']['ports']
-    # ports_int = [int(port) for port in ports]
-    csc_Id=csc_id,
-    port=8080,
-    status='okay',
-    info='Ready',
-    mi='dummy mi',
-    dc='dummy dc',
-    mac='dummy mac_address',
-    purpose='testing2'
-    device_exists = DeviceFetch.objects.exists()
-    device, created = DeviceFetch.objects.get_or_create(
-            id=1,  # Assuming there is only one entry in the table, so we use a fixed id
-            defaults={
-                'port': port,
-                'status': status,
-                'info': info,
-                'dc': dc,
-                'mi': mi,
-                'mac': mac,
-                'csc_Id': csc_id,
-                'purpose': purpose
-            }
-        )
+# def saveauthdb(request):
+#     # data = json.loads(request.body)
+#     csc_id = request.session.get('csc_Id')
+#     # mac_address = data.get('mac_address')
+#     # ports = data['dev_infos']['ports']
+#     # ports_int = [int(port) for port in ports]
+#     csc_Id=csc_id,
+#     port=8080,
+#     status='okay',
+#     info='Ready',
+#     mi='dummy mi',
+#     dc='dummy dc',
+#     mac='dummy mac_address',
+#     purpose='testing2'
+#     device_exists = DeviceFetch.objects.exists()
+#     device, created = DeviceFetch.objects.get_or_create(
+#             id=1,  # Assuming there is only one entry in the table, so we use a fixed id
+#             defaults={
+#                 'port': port,
+#                 'status': status,
+#                 'info': info,
+#                 'dc': dc,
+#                 'mi': mi,
+#                 'mac': mac,
+#                 'csc_Id': csc_id,
+#                 'purpose': purpose
+#             }
+#         )
 
-        # If the entry already existed, update its values with the new ones
-    if not created:
-        device.port = port
-        device.status = status
-        device.info = info
-        device.dc = dc
-        device.mi = mi
-        device.mac = mac
-        device.csc_Id = csc_id
-        device.purpose = purpose
-        device.save()
-        return HttpResponse('updated {0}'.format(device_exists), status = 200)
-    return HttpResponse('created', status = 200)
+#         # If the entry already existed, update its values with the new ones
+#     if not created:
+#         device.port = port
+#         device.status = status
+#         device.info = info
+#         device.dc = dc
+#         device.mi = mi
+#         device.mac = mac
+#         device.csc_Id = csc_id
+#         device.purpose = purpose
+#         device.save()
+#         return HttpResponse('updated {0}'.format(device_exists), status = 200)
+#     return HttpResponse('created', status = 200)
 
 
-    device_exists = DeviceFetch.objects.exists()
-    #DB fetch start
-    conn = mysql.connector.connect(host='127.0.0.1', password = 'AATricks372!', user= 'root')
-    db_cursor = conn.cursor()
-    db_cursor.execute("USE npci")
-    # Execute a SELECT query to retrieve data from the npci_resp_table
-    db_cursor.execute("SELECT * FROM npci_resp_table")
-    print('database created')
-    rows = db_cursor.fetchall()
-    i = 1
-    # Process the retrieved data
-    data_passbook = []
-    for row in rows:
-        user_txndata = {}
-        xml_data = row[2]
-        try:
-            json_data = xmltodict.parse(xml_data)
-            json_data_dump = json.dumps(json_data)
-            json_data_loads = json.loads(json_data_dump)
-            # print(json_data_loads)
-            if 'ns2:RespPay' in json_data_loads:
-                cust_ref = json_data_loads['ns2:RespPay']['Txn']['@custRef']
-                ts = json_data_loads['ns2:RespPay']['Txn']['@ts']
-                dt_object = datetime.fromisoformat(ts)
-                # Convert datetime object to desired format
-                normal_date_time = dt_object.strftime('%Y-%m-%d %H:%M:%S')
-                org_amount = json_data_loads['ns2:RespPay']['Resp']['Ref'][0]['@orgAmount']
-                purpose = json_data_loads['ns2:RespPay']['Txn']['@purpose']
-                if purpose == '22':
-                    purpose = 'Dr'
-                elif purpose == '23':
-                    purpose = 'Cr'
-                # print(i," CustRef respay:", cust_ref)
-                # print(ts)
-                # print('org amount', org_amount)
-                # print("purpose:", purpose)
-                user_txndata= {
-                    's_no.': i,
-                    'db_s_no':row[0],
-                    'cust_ref':cust_ref,
-                    'ts':normal_date_time,
-                    'org_amount':org_amount,
-                    'purpose':purpose
-                }
-                data_passbook.append(user_txndata)
-                i = i+1
-                
-            elif 'ns2:Ack' in json_data_loads:
-                cust_ref = 'NA'
-                print("CustRef Ack:", cust_ref)
-            # print(i)
-        except ExpatError as e:
-            print(f"Error parsing XML data: {e}")
-    return render(request, 'passbooktestdb.html', {'device_exists':device_exists,'data_passbook': data_passbook})
+@access_token_required
+def mini_statement(request):
+    vle_name=request.session.get('vle_name')
+    csc_id = request.session.get('cscid')
+    
+    context = {'vle_name':vle_name, 'csc_id':csc_id}
+    return render(request,'transaction/ministatement.html',context)
+
+@access_token_required
+def base_recepit(request):
+    vle_name=request.session.get('vle_name')
+    csc_id = request.session.get('cscid')
+    agent_id = request.session.get('agent_id')
+    terminal_id=request.session.get('terminal_id')
+    # aadhar_number="X"*(8) + request.session.get('aadhar_number') [8:] 
+    import pdb;  pdb.set_trace()
+    
+    context = {'vle_name':request.session.get('vle_name'),
+               'csc_id': request.session.get('cscid'),
+               'agent_id':request.session.get('agent_id'),
+               'terminal_id':request.session.get('terminal_id'),
+               'aadhar_number':"X"*(8) + request.session.get('aadhar_number')[8:],
+               'date_ts': request.session.get('ts'),
+               'txn_id': request.session.get('txn_id'),
+               'txn_amount': request.session.get('txn_amount'),
+               }
+    return render(request,'base_receipt.html',context)
+    

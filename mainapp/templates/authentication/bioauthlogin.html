@@ -70,7 +70,7 @@
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="chart-area" style="height: 30rem;">
-                        <form id="withdrawForm" method="POST" action="{% url 'saveauthdb' %}">
+                        <form id="withdrawForm" method="POST" action="">
                             {% csrf_token %}
                             <div class="form-group" >
                                 <div class="col-md-9">
@@ -90,7 +90,7 @@
                             </div>
                             
                             <div class="row">
-                                &nbsp; &nbsp; <button type="submit" id="registerbioauth" class="btn btn-primary btn-withdraw" onclick="register_New_Device()" >Register Device</button>
+                                &nbsp; &nbsp; <button type="button" id="registerbioauth" class="btn btn-primary btn-withdraw" onclick="register_New_Device()" >Register Device</button>
                             </div>              
                         </form>
                     </div>

@@ -25,7 +25,7 @@
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="chart-area" style="height: 30rem;">
-                        <form id="withdrawForm" method="POST" action="{% url 'saveauthdb' %}">
+                        <form id="withdrawForm" method="POST" action="">
                             {% csrf_token %}
                             <div class="form-group" >
                                 <div class="col-md-9">
@@ -45,8 +45,15 @@
                             </div>
                             
                             <div class="row">
-                                &nbsp; &nbsp; <button type="submit" id="registerbioauth" class="btn btn-primary btn-withdraw" onclick="register_New_Device()" >Register Device</button>
-                            </div>              
+                                &nbsp; &nbsp; <button type="button" id="registerbioauth" class="btn btn-primary btn-withdraw" onclick="register_New_Device()" >Register Device</button>
+                            </div> 
+                            <div style="display: none;">
+                                    <textarea id="device_info" rows="4" cols="50" name="device_info" ></textarea>
+                                <br>
+                                    <textarea id="Pid Options" rows="4" cols="50" name="pid_options" ></textarea>
+                                <br>
+                                    <textarea id="Pid Data" rows="4" cols="50" name="pid_data" ></textarea>
+                            </div>             
                         </form>
                     </div>
                 </div>

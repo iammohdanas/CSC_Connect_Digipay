@@ -41,6 +41,6 @@ urlpatterns = [
     path('bioauthlogin/',views.bioauthlogin,name='bioauthlogin'),
     path('register_or_update_device_api/',register_or_update_device_api, name='register_or_update_device_api'),
     path('registered_device_api/',registered_device_api, name='registered_device_api'),
-    path('saveauthdb/',views.saveauthdb, name='saveauthdb'),
+    # path('saveauthdb/',views.saveauthdb, name='saveauthdb'),
     path('payout/',views.payout, name='payout'),
 ]

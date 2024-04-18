@@ -275,7 +275,13 @@ async function globalCapture(start_port,end_port) {
         }
         else
         {
-        document.getElementById('deviceName').value = "("+selected_device["status"]+")"+selected_device["info"];
+            console.log("capture_deviceRegistered",capture_deviceRegistered);
+            console.log("deviceRegistered",deviceRegistered);
+            if (capture_deviceRegistered===false && deviceRegistered===false)
+            {
+                document.getElementById('deviceName').value = "("+selected_device["status"]+")"+selected_device["info"];
+            }
+        
         console.log("deviceInfoAvdm(selected_device)",selected_device);
         const deviceInfoResult = await deviceInfoAvdm(selected_device);
         console.log("device Info Result:", deviceInfoResult);
@@ -312,8 +318,8 @@ async function globalCapture(start_port,end_port) {
 
          // Populate textarea fields
         document.getElementById('device_info').value = deviceInfoResult.data;
-        document.getElementById('Pid Options').value = captureResult.xml;
-        document.getElementById('Pid Data').value = captureResult.data;
+        document.getElementById('Pid_Options').value = captureResult.xml;
+        document.getElementById('Pid_Data').value = captureResult.data;
         //await pid_data(captureResult.data);
         // console.log("ready ports",ready_devices.ready_devices.port);
          // Check if the device is not registered
@@ -462,6 +468,7 @@ async function capture_using_registered_device() {
 }
 
 async function register_New_Device() {
+    debugger;
     const uniqueId = 2249190931;
     let message="";
     // Registering new devices for bio authentication
@@ -482,7 +489,7 @@ async function register_New_Device() {
         deviceRegistered=true;
         return message;
     }
-    const deviceRegistered_status = await get_register_device(uniqueId, devInfo,purpose);
+    const deviceRegistered_status = await get_register_device(uniqueId, devInfo);
     console.log("deviceRegistered_status",deviceRegistered_status);
     if(deviceRegistered_status["process_status"]===true && deviceRegistered_status["message"]!== undefined){
     //    if (typeof deviceRegistered_status === 'object' && deviceRegistered_status.error_message && deviceRegistered_status.error_message.length > 0) {
@@ -521,6 +528,7 @@ async function get_register_device(mac_address, dev_info) {
         }
 
         // If the device is not registered, proceed with registration
+  
         const response = await fetch('/register_or_update_device_api/', {
             method: 'POST',
             body: JSON.stringify({ mac_address: mac_address, dev_infos: dev_info ,purpose:document.getElementById('inputPurpose').value}),
