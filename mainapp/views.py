@@ -24,6 +24,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from django.contrib.auth import logout
 from datetime import datetime, timedelta
+import mysql.connector
+from xml.parsers.expat import ExpatError
 # Assuming connector is a custom class in your Django app
 
 client_id = "e0065bb4-b648-419b-e973-2e6e49552bd7"
@@ -229,7 +231,57 @@ def authdevregister(request):
 @access_token_required
 def passbook(request):
     device_exists = DeviceFetch.objects.exists()
-    return render(request,'transaction/passbook.html',{'device_exists':device_exists})
+    #DB fetch start
+    conn = mysql.connector.connect(host='127.0.0.1', password = 'AATricks372!', user= 'root')
+    db_cursor = conn.cursor()
+    db_cursor.execute("USE npci")
+    # Execute a SELECT query to retrieve data from the npci_resp_table
+    db_cursor.execute("SELECT * FROM npci_resp_table")
+    # print('database created')
+    rows = db_cursor.fetchall()
+    i = 1
+    # Process the retrieved data
+    data_passbook = []
+    for row in rows:
+        user_txndata = {}
+        xml_data = row[2]
+        try:
+            json_data = xmltodict.parse(xml_data)
+            json_data_dump = json.dumps(json_data)
+            json_data_loads = json.loads(json_data_dump)
+            # print(json_data_loads)
+            if 'ns2:RespPay' in json_data_loads:
+                cust_ref = json_data_loads['ns2:RespPay']['Txn']['@custRef']
+                ts = json_data_loads['ns2:RespPay']['Txn']['@ts']
+                dt_object = datetime.fromisoformat(ts)
+                # Convert datetime object to desired format
+                normal_date_time = dt_object.strftime('%Y-%m-%d %H:%M:%S')
+                org_amount = json_data_loads['ns2:RespPay']['Resp']['Ref'][0]['@orgAmount']
+                purpose = json_data_loads['ns2:RespPay']['Txn']['@purpose']
+                if purpose == '22':
+                    purpose = 'Dr'
+                elif purpose == '23':
+                    purpose = 'Cr'
+                # print(i," CustRef respay:", cust_ref)
+                # print(ts)
+                # print('org amount', org_amount)
+                # print("purpose:", purpose)
+                user_txndata= {
+                    's_no.': i,
+                    'db_s_no':row[0],
+                    'cust_ref':cust_ref,
+                    'ts':normal_date_time,
+                    'org_amount':org_amount,
+                    'purpose':purpose
+                }
+                data_passbook.append(user_txndata)
+                i = i+1
+                
+            elif 'ns2:Ack' in json_data_loads:
+                ack_data = json_data_loads
+        except ExpatError as e:
+            print(f"Error parsing XML data: {e}")
+    return render(request, 'transaction/passbook.html', {'device_exists':device_exists,'data_passbook': data_passbook})
 
 @access_token_required
 def aepspassbook(request):
@@ -279,6 +331,11 @@ def baseauth(request):
 def bioauthlogin(request):
     device_exists = DeviceFetch.objects.exists()
     return render(request,'authentication/bioauthlogin.html',{'device_exists':device_exists})
+
+@access_token_required
+def payout(request):
+    csc_id = request.session.get('cscid')
+    return render(request,'transaction/payout.html',{'csc_id':csc_id})
 
 @access_token_required
 def aepstransaction(request):
@@ -414,3 +471,59 @@ def saveauthdb(request):
         device.save()
         return HttpResponse('updated {0}'.format(device_exists), status = 200)
     return HttpResponse('created', status = 200)
+
+
+    device_exists = DeviceFetch.objects.exists()
+    #DB fetch start
+    conn = mysql.connector.connect(host='127.0.0.1', password = 'AATricks372!', user= 'root')
+    db_cursor = conn.cursor()
+    db_cursor.execute("USE npci")
+    # Execute a SELECT query to retrieve data from the npci_resp_table
+    db_cursor.execute("SELECT * FROM npci_resp_table")
+    print('database created')
+    rows = db_cursor.fetchall()
+    i = 1
+    # Process the retrieved data
+    data_passbook = []
+    for row in rows:
+        user_txndata = {}
+        xml_data = row[2]
+        try:
+            json_data = xmltodict.parse(xml_data)
+            json_data_dump = json.dumps(json_data)
+            json_data_loads = json.loads(json_data_dump)
+            # print(json_data_loads)
+            if 'ns2:RespPay' in json_data_loads:
+                cust_ref = json_data_loads['ns2:RespPay']['Txn']['@custRef']
+                ts = json_data_loads['ns2:RespPay']['Txn']['@ts']
+                dt_object = datetime.fromisoformat(ts)
+                # Convert datetime object to desired format
+                normal_date_time = dt_object.strftime('%Y-%m-%d %H:%M:%S')
+                org_amount = json_data_loads['ns2:RespPay']['Resp']['Ref'][0]['@orgAmount']
+                purpose = json_data_loads['ns2:RespPay']['Txn']['@purpose']
+                if purpose == '22':
+                    purpose = 'Dr'
+                elif purpose == '23':
+                    purpose = 'Cr'
+                # print(i," CustRef respay:", cust_ref)
+                # print(ts)
+                # print('org amount', org_amount)
+                # print("purpose:", purpose)
+                user_txndata= {
+                    's_no.': i,
+                    'db_s_no':row[0],
+                    'cust_ref':cust_ref,
+                    'ts':normal_date_time,
+                    'org_amount':org_amount,
+                    'purpose':purpose
+                }
+                data_passbook.append(user_txndata)
+                i = i+1
+                
+            elif 'ns2:Ack' in json_data_loads:
+                cust_ref = 'NA'
+                print("CustRef Ack:", cust_ref)
+            # print(i)
+        except ExpatError as e:
+            print(f"Error parsing XML data: {e}")
+    return render(request, 'passbooktestdb.html', {'device_exists':device_exists,'data_passbook': data_passbook})

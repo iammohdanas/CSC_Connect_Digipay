@@ -1,0 +1,141 @@
+{% extends "base2.html" %}
+{% load static %}
+
+{% block page-content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Payout</h1>
+        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+    </div>
+    <!-- Content Row -->
+    <div class="row">
+        <!-- Area Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">VLE Details</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Dropdown Header:</div>
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area" style="height: 14rem;">
+                        <div style="text-align: center;">
+                            <h3>User Account Details</h3>
+                            <div class="container" style="margin-top: 15px; margin-bottom: 15px;">
+                                <div style="margin-bottom: 15px; text-align: left;">
+                                    <label for="account-id" style="font-weight: bold;">CSC ID : &nbsp;</label><span>{{ csc_id }}</span>
+                                </div>
+                                <div style="margin-bottom: 15px; text-align: left;">
+                                    <label for="fullname" style="font-weight: bold;">Bank Name : &nbsp;</label> <span>Axis Bank</span>
+                                </div>
+                                <div style="margin-bottom: 15px; text-align: left;">
+                                    <label for="balance" style="font-weight: bold;">A/C Holder : &nbsp;</label> <span>VLE Name</span>
+                                </div>
+                                <div style="margin-bottom: 15px; text-align: left;">
+                                    <label for="balance" style="font-weight: bold;">IFSC : &nbsp;</label> <span>UTIB0000049</span>
+                                </div>
+                            </div>
+                            <!-- Add other details here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <!-- <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">VLE Details</h6>
+                </div> -->
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area" style="height: 20rem;">
+                        <form id="withdrawForm" method="POST" action="#">
+                            {% csrf_token %}
+                            <div class="form-group" id="amountField">
+                                <label for="amount">Amount</label>
+                                <input type="number" class="form-control" id="withdrawformamount" name="wallettopupinputamount" placeholder="Enter amount" required>
+                                <small id="amountHelp" class="form-text text-muted">Enter the amount you want to Topup Wallet.</small>
+                            </div>
+                            
+                            <div class="btn-group" role="group" aria-label="Withdraw Buttons">
+                                <button type="button" class="btn btn-secondary withdraw-btn" data-amount="100">100</button>
+                                <button type="button" class="btn btn-secondary withdraw-btn" data-amount="500" style="margin-left: 10px;">500</button>
+                                <button type="button" class="btn btn-secondary withdraw-btn" data-amount="1000" style="margin-left: 10px;">1000</button>
+                                <button type="button" class="btn btn-secondary withdraw-btn" data-amount="2000" style="margin-left: 10px;">2000</button>
+                            </div>
+                            <br><br>
+                            <label>Transaction Type:</label>
+                            <div class="row">
+                                &nbsp; &nbsp; 
+                                <label>
+                                    <input type="radio" name="transaction_type" value="imps"> IMPS
+                                </label> &nbsp; &nbsp; &nbsp; 
+                                <label>
+                                    <input type="radio" name="transaction_type" value="neft"> NEFT
+                                </label>
+                            </div>
+                            
+                            <div class="row">
+                                &nbsp; &nbsp; <button type="button" id="capture_button" onclick="" class="btn btn-primary btn-authenticate">Authenticate</button> &nbsp; &nbsp; &nbsp; 
+                                <button type="submit" id="proceed_button" class="btn btn-primary btn-withdraw" >Proceed</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div
+                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Important Instructions</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area" style="height: 30rem; overflow-y: scroll;">
+                        <b>Important Notice</b>
+                        <ul>
+                        <li>Above INR 25,000 and upto INR 2,00,000: INR 10.00+GST</li>
+                        <li>Note: Each Cash Withdrawal Transaction has some charges.</li>
+                        <li>Upto INR 25,000: INR 5.00+GST</li>
+                        </ul>
+                        <hr>
+                        <b>IMPS Charges for Payout:</b>
+                        <ul>
+                            <li>Upto INR 25,000: INR 5.00+GST</li>
+                            <li>Above INR 25,000 and upto INR 2,00,000: INR 10.00+GST</li>
+                            <li>Note: Each Cash Withdrawal Transaction has some charges.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% block jquery_script %}<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>{% endblock jquery_script %}
+<!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
+<script src="{% static 'js/transaction/walletTopup.js' %}"></script>
+<script src="{% static 'js/bioauth.js' %}"></script>
+<!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+{% endblock page-content %}

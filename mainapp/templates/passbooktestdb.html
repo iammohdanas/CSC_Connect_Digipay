@@ -14,29 +14,29 @@
     <div class="table-container" style="margin-top:40px; height: 45rem; overflow-y: scroll;">
       <table id="historydatatable" class="table table-striped" style="width:100%">
           <thead>
-            <tr>
-                <th>Reference No.</th>
-                <th>Transaction Amount (INR)</th>
-                <th>Wallet Balance (INR)</th>
-                <th>Transaction Type</th>
-                <th>Request Code</th>
-                <th>Date & Time</th>
-                <th>Remarks</th>
-                <!-- <th scope="col">Reference Number</th>
-                <th scope="col">Transaction amount</th>
-                <th scope="col">Wallet Balance</th>
-                <th scope="col">Transaction Type</th>
-                <th scope="col">Request Code</th>
-                <th scope="col">Date & Time</th>
-                <th scope="col">Remarks</th> -->
-            </tr>
-        </thead>
-        <tbody>
+              <tr>
+                  <th>Reference No.</th>
+                  <th>Transaction Amount (INR)</th>
+                  <th>Wallet Balance (INR)</th>
+                  <th>Transaction Type</th>
+                  <th>Request Code</th>
+                  <th>Date & Time</th>
+                  <th>Remarks</th>
+                  <!-- <th scope="col">Reference Number</th>
+                  <th scope="col">Transaction amount</th>
+                  <th scope="col">Wallet Balance</th>
+                  <th scope="col">Transaction Type</th>
+                  <th scope="col">Request Code</th>
+                  <th scope="col">Date & Time</th>
+                  <th scope="col">Remarks</th> -->
+              </tr>
+          </thead>
+          <tbody>
             {% for entry in data_passbook %}
             <tr>
                 <td>{{ entry.cust_ref }}</td>
                 <td>{{ entry.org_amount }}</td>
-                <td>{% if entry.bal_amount %}{{ entry.bal_amount }}{% else %}NA{% endif %}</td>
+                <td>NA</td>
                 <td>{{ entry.purpose }}</td>
                 <td>NA</td>
                 <td>{{ entry.ts }}</td>
@@ -44,7 +44,7 @@
             </tr>
             {% endfor %}
             
-        </tbody>
+          </tbody>
       </table>
     </div>
 </div>
