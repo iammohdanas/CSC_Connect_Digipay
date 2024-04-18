@@ -1,0 +1,104 @@
+{% extends "base2.html" %}
+{% load static %}
+
+{% block page-content %}
+
+<div class="container-fluid">
+    <div>
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Recepit</h1>
+        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+        class="fas fa-download fa-sm text-white-50"></i> Generate Recepit</a>
+    </div>
+    <div class="align-items-center row">
+        <div class="col-6 w-100">
+        <!-- <div class="table-container" style="margin-top:40 px; height: 45rem; overflow-y: scroll;"> -->
+            <table id="base_receipt_table" class="table" style="border: 2px solid rgb(230, 230, 230); justify-content: center;" colspan="6">
+            <thead style="background-color: green; color: white;">
+                <tr>
+                    <th> Transaction Successfull!</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>DATE:{{context.date_ts}}</td>
+                </tr>
+                <tr>
+                    <td>AGENT ID:{{context.agent_id}}</td>
+                </tr>
+                <tr>
+                    <td>AGENT:{{context.vle_name}}</td>
+                </tr>
+                <tr>
+                    <td>LOCATION:</td>
+                </tr>
+                <tr>
+                    <td>TERMINAL ID:{{context.terminal_id}}</td>
+                </tr>
+                <tr>
+                    <td>STAN:</td>
+                </tr>
+                <tr>
+                    <td>TXN ID:{{context.txnId}}</td>
+                </tr>
+                <tr>
+                    <td>RRN:</td>
+                </tr>
+                <tr>
+                    <td>CUSTOMER ID:{{context.aadhar_number }}</td>
+                </tr>
+                <tr>
+                    <td>MSG REF:</td>
+                </tr>
+                <tr>
+                    <td>AUTHORIZE CODE:</td>
+                </tr>
+                <tr>
+                    <td>DEPOSIT ID:</td>
+                </tr>
+                <tr>
+                    <td>MSG:</td>
+                </tr>
+                <tr>
+                    <td>CUSTOMER BANK:{{ bank.BANK_NAME }}</td>
+                </tr>
+                <tr>
+                    <td>AMOUNT:{{context.txn_amount}}</td>
+                </tr>
+                <tr>
+                    <td>BALANCE:</td>
+                </tr>
+             
+            </tbody>
+            </table>
+        </div>
+        <div class="col-6 w-100">
+        {% block content %}
+        {% endblock content %}
+        </div>
+        </div>
+    
+    </div>
+</div>
+            
+<!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
+<script src="{% static 'js/transaction/walletTopup.js' %}"></script>
+<script src="{% static 'js/bioauth.js' %}"></script>
+<!-- Bootstrap JS (Optional, only required if you need Bootstrap JavaScript features) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- DataTables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#historydatatable').DataTable();
+    });
+</script>
+{% endblock page-content %}

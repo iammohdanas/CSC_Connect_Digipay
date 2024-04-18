@@ -79,18 +79,18 @@
                             
                             <div class="row">
                                 &nbsp; &nbsp; <button type="button" id="capture_button" onclick="capture_using_registered_device()" class="btn btn-primary btn-authenticate">Authenticate</button> &nbsp; &nbsp; &nbsp; 
-                                <button type="submit" id="proceed_button" class="btn btn-primary btn-withdraw" disabled>Proceed</button>
+                                <button type="submit" id="proceed_button" class="btn btn-primary btn-withdraw" >Proceed</button>
                             </div>
                             <div id="authentication_message" style="display: none;"></div>
-                            <a class="nav-link" id="authdevregister" href="{% url 'authdevregister' %}" style="color: purple; font-style: italic; font-family:emoji;">Click Here to Register Bio Auth Device</a>
+                            <!-- <a class="nav-link" id="authdevregister" href="{% url 'authdevregister' %}" style="color: purple; font-style: italic; font-family:emoji;">Click Here to Register Bio Auth Device</a> -->
         
                             
                             <div>
                                     <textarea id="device_info" rows="4" cols="50" name="device_info" ></textarea>
                                 <br>
-                                    <textarea id="Pid_Options" rows="4" cols="50" name="pid_options" ></textarea>
+                                    <textarea id="Pid_Options" rows="4" cols="50" name="Pid_Options" ></textarea>
                                 <br>
-                                    <textarea id="Pid_Data" rows="4" cols="50" name="pid_data" ></textarea>
+                                    <textarea id="Pid_Data" rows="4" cols="50" name="Pid_Data" ></textarea>
                             </div>
                         </form>
                     </div>

@@ -2,6 +2,7 @@ from audioop import reverse
 import base64
 import datetime
 from datetime import datetime
+import time
 from functools import wraps
 from io import BytesIO
 import json
@@ -186,9 +187,11 @@ def process_withdrawform(request):
         configinput["transaction_type"] = request.POST.get('transactionType', None)
         pidOptions = request.POST.get('Pid_Options')
         pidData = request.POST.get('Pid_Data')
+        print('*********Pid Data',pidData)
+        print('****Pid Option',pidOptions)
         device_info = request.POST.get('device_info')
         print("deviceInfoFingerprint******************")
-
+    
     device_info = xmltodict.parse(device_info)
     configinput["dpId"] = device_info['DeviceInfo']['@dpId']
     configinput["dc"] = device_info['DeviceInfo']['@dc']
@@ -197,11 +200,14 @@ def process_withdrawform(request):
     configinput["mi"] = device_info['DeviceInfo']['@mi']
     configinput["mc"] = device_info['DeviceInfo']['@mc']
 
-    pidData = xmltodict.parse(pidData)
-    configinput["ci_value"] = pidData['PidData']['Skey']['@ci']
-    configinput["Skey_Value"] = pidData['PidData']['Skey']['#text']
-    configinput["Hmac_Value"] = pidData['PidData']['Hmac']
-    configinput["dataValue"] = pidData['PidData']['Data']['#text']
+    if pidData:
+        pidData = xmltodict.parse(pidData)
+        configinput["ci_value"] = pidData['PidData']['Skey']['@ci']
+        configinput["Skey_Value"] = pidData['PidData']['Skey']['#text']
+        configinput["Hmac_Value"] = pidData['PidData']['Hmac']
+        configinput["dataValue"] = pidData['PidData']['Data']['#text']
+    else:
+        pidData = None
 
     txn_id = generate_txn_id(request)   
     msg_id = generate_msg_id(request)
@@ -412,6 +418,7 @@ def walletTopup(request):
     device_exists = DeviceFetch.objects.exists()
     return render(request,'transaction/walletTopup.html',{'instruction_data': data,'device_exists':device_exists} )
 
+@access_token_required
 def wallet_topup_process(request):
     configinputwallet = {}
     configinputwallet['txnAmount'] = request.POST.get('wallettopupinputamount')
@@ -489,29 +496,21 @@ def logout_user(request):
 #         return HttpResponse('updated {0}'.format(device_exists), status = 200)
 #     return HttpResponse('created', status = 200)
 
-
 @access_token_required
 def mini_statement(request):
     vle_name=request.session.get('vle_name')
     csc_id = request.session.get('cscid')
-    
     context = {'vle_name':vle_name, 'csc_id':csc_id}
     return render(request,'transaction/ministatement.html',context)
 
 @access_token_required
-def base_recepit(request):
-    vle_name=request.session.get('vle_name')
-    csc_id = request.session.get('cscid')
-    agent_id = request.session.get('agent_id')
-    terminal_id=request.session.get('terminal_id')
-    # aadhar_number="X"*(8) + request.session.get('aadhar_number') [8:] 
-    import pdb;  pdb.set_trace()
-    
+def base_receipt(request):
+    # import pdb;  pdb.set_trace()
     context = {'vle_name':request.session.get('vle_name'),
                'csc_id': request.session.get('cscid'),
                'agent_id':request.session.get('agent_id'),
                'terminal_id':request.session.get('terminal_id'),
-               'aadhar_number':"X"*(8) + request.session.get('aadhar_number')[8:],
+               'aadhar_number':"X"*(8) + (request.session.get('aadhar_number'))[8:] ,
                'date_ts': request.session.get('ts'),
                'txn_id': request.session.get('txn_id'),
                'txn_amount': request.session.get('txn_amount'),

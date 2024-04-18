@@ -105,15 +105,16 @@ async function deviceInfoAvdm(discoveryResult) {
     return res;
 }
 
-async function captureAvdm(discoveryResult, fCount=1, iCount=0, iType='', txtWithaadhar='', txtOtp='', txtClientKey='',environment="") {
+async function captureAvdm(discoveryResult, fCount=1, iCount=0, iType='', fType='',environment="",txtWithaadhar='', txtOtp='', txtClientKey='') {
     let result = {};
     let pidData_res ;
+    console.log("environment=>",environment);
     const strWithaadhar = txtWithaadhar !== '' ? ` wadh="${txtWithaadhar}"` : '';
     const strOtp = txtOtp !== '' ? ` otp="${txtOtp}"` : '';
 
     const XML = `<?xml version="1.0"?>
         <PidOptions ver="1.0">
-            <Opts fCount="${fCount}" fType="2" iCount="${iCount}" itpye="${iType}" pCount="0" pgCount="0"${strOtp} format="0" 
+            <Opts fCount="${fCount}" fType="${fType}" iCount="${iCount}" itpye="${iType}" pCount="0" pgCount="0"${strOtp} format="0" 
                   pidVer="2.0" timeout="20000" pTimeout=""${strWithaadhar} posh="UNKNOWN" env="${environment}" />
             <CustOpts>
                 <Param name="ValidationKey" value="${txtClientKey}" />
@@ -300,13 +301,13 @@ async function globalCapture(start_port,end_port) {
         {
             let env = prompt(`Which environment?\n P\nPP\n`);
             env = String(env); 
-            let fCount = 1, iCount = 0, iType = '';         
+            let fCount = 1, iCount = 0, iType = '',ftype="2";         
             if(selected_device["info"].includes("Iris")){
                 fCount = 0, iCount = 1, iType = 'ISO';  
             }
             if(env==='P' || env==='PP'){
             console.log(env);
-            captureResult = await captureAvdm(selected_device,fCount,iCount,iType,env);
+            captureResult = await captureAvdm(selected_device,fCount,iCount,iType,ftype,env);
             console.log("capture Result:", captureResult);
             }
 
@@ -449,9 +450,9 @@ async function capture_using_registered_device() {
         console.log("Device is already registered with ports:", start_port );
         // Call globalCapture with the registered ports
         // deviceRegistered=true;
-        // capture_deviceRegistered=true;
-        let message=await globalCapture(start_port,end_port);
         capture_deviceRegistered=true;
+        let message=await globalCapture(start_port,end_port);
+        // capture_deviceRegistered=true;
         console.log("message",message);
 
         console.log("**Capture using registered device ports:", end_port);

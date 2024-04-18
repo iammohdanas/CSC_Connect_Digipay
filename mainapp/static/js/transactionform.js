@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var aadharNumberField = document.getElementById("aadharNumberField");
     var amountField = document.getElementById("amountField");
     var bankOptionField = document.getElementById("bankOptionField");
-    var authdevregister =  document.getElementById("authdevregister");
+    // var authdevregister =  document.getElementById("authdevregister");
     var aadharInput = document.getElementById("withdrawformaadharNumber");
     var mobileInput = document.getElementById("withdrawformcustomerMobileNumber");
     var amountInput =  document.getElementById("withdrawformamount");
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
             aadharNumberField.style.display = "block";
             bankOptionField.style.display = "block";
             amountField.style.display = "block";
-            authdevregister.style.display = "block";
+            // authdevregister.style.display = "block";
             enableFields();
             clearFields();
         } else if (selectedTransactionType === "26") {
@@ -42,14 +42,14 @@ document.addEventListener("DOMContentLoaded", function() {
             aadharNumberField.style.display = "block";
             bankOptionField.style.display = "block";
             amountField.style.display = "block";
-            authdevregister.style.display = "block";
+            // authdevregister.style.display = "block";
             clearFields();
         } else {
             customerMobileNumberField.style.display = "none";
             aadharNumberField.style.display = "none";
             bankOptionField.style.display = "none";
             amountField.style.display = "none";
-            authdevregister.style.display = "none";
+            // authdevregister.style.display = "none";
             clearFields();
             disableFields();
         }

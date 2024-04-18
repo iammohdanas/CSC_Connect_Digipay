@@ -43,4 +43,6 @@ urlpatterns = [
     path('registered_device_api/',registered_device_api, name='registered_device_api'),
     # path('saveauthdb/',views.saveauthdb, name='saveauthdb'),
     path('payout/',views.payout, name='payout'),
+    path('ministatement/',views.mini_statement, name='ministatement'),
+    path('base_receipt/',views.base_receipt, name='base_receipt'),
 ]
