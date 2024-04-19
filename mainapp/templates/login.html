@@ -4,7 +4,12 @@
 
 {% block page-content %}
 <div class="container-fluid">
-
+    <!-- Maintenance banner -->
+    {% if maintenance_info %}
+    <div class="d-sm-flex align-items-center justify-content-between mb-4" style="background-color: #f3d8796e; color: black; padding: .5rem; border-radius: 5px;">
+        <b>{{ maintenance_info }}</b>
+    </div>
+    {% endif %}
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Login to Proceed</h1>

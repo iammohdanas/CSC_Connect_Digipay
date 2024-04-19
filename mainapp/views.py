@@ -39,7 +39,10 @@ def login(request):
     if request.session.get("access_token") is not None:
         return render(request, 'dashboard.html')
     else:
-        return render(request, 'login.html')
+        with open('mainapp/data/maintenance_downtime.txt', 'r') as file:
+            maintenance_info = file.read()
+        context = {'maintenance_info':maintenance_info}
+        return render(request, 'login.html',context)
 
 def redirect_fun(request):
     return redirect(connector.first_call())
@@ -108,7 +111,7 @@ def process_login(request):
             request.session['terminal_id']=terminal_id
             mobile_no = user_data['mobile']
             otp = generate_otp_function()   
-            new_mssg_api("8858045785", otp)
+            new_mssg_api("7017528755", otp)
             request.session['otp'] = otp
             request.session['mobile'] = mobile_no
             context = {
@@ -335,7 +338,9 @@ def dashboarddigipay(request):
     csc_id = request.session.get('cscid')
     current_month = datetime.now().strftime("%B")
     device_exists = DeviceFetch.objects.exists()
-    context = {'vle_name':vle_name, 'csc_id':csc_id, 'current_month':current_month,'device_exists':device_exists}
+    with open('mainapp/data/maintenance_downtime.txt', 'r') as file:
+            maintenance_info = file.read()
+    context = {'vle_name':vle_name, 'csc_id':csc_id, 'current_month':current_month,'device_exists':device_exists, 'maintenance_info':maintenance_info}
     return render(request,'dashboarddigipay.html',context)
 
 def base2(request):
@@ -516,4 +521,5 @@ def base_receipt(request):
                'txn_amount': request.session.get('txn_amount'),
                }
     return render(request,'base_receipt.html',context)
-    
+
+
