@@ -55,16 +55,11 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                {% if device_exists %}
-                    <a class="nav-link collapsed" href="{% url 'transactionform' %}" >
-                {% else %}
-                    <a class="nav-link collapsed" href="{% url 'authdevregister' %}" >
-                {% endif %}
+                    <a class="nav-link collapsed" href="{% url 'bioauthVLE' %}" >
                     <i class="fas fa-fw fa-cog"></i>
                     <span>AEPS Transactions</span>
                 </a>
-                
-            </li>
+            </li> 
 
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item">

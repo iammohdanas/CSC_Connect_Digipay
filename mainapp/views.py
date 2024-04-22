@@ -36,12 +36,12 @@ connector = Connect(client_id, redirect_uri, client_key)
 
 
 def login(request):
-    if request.session.get("access_token") is not None:
-        return render(request, 'dashboard.html')
-    else:
-        with open('mainapp/data/maintenance_downtime.txt', 'r') as file:
+    with open('mainapp/data/maintenance_downtime.txt', 'r') as file:
             maintenance_info = file.read()
-        context = {'maintenance_info':maintenance_info}
+    context = {'maintenance_info':maintenance_info()}
+    if request.session.get("access_token") is not None:
+        return render(request, 'dashboard.html',context)
+    else:
         return render(request, 'login.html',context)
 
 def redirect_fun(request):
@@ -148,6 +148,23 @@ def verify_otp(request):
         print("context",context)
     request.session['context_data']=context
     return HttpResponse("Error 404")
+
+def bioauthVLE(request):
+    device_exists = DeviceFetch.objects.exists()
+    context = {'device_exists':device_exists}
+    return render(request,"authentication/bioauthVLE.html",context)
+
+
+def processVLEAuth(request):
+    device_exists = DeviceFetch.objects.exists()
+    if device_exists:
+        return redirect('transactionform')
+    else:
+        return redirect('authdevregister')
+
+def check_device_existence(request):
+    device_exists = DeviceFetch.objects.exists()
+    return JsonResponse({'device_exists': device_exists})
 
 def afterloginbioauth(request):
     if request.session.get('otpverifystatus')==True:
@@ -338,9 +355,7 @@ def dashboarddigipay(request):
     csc_id = request.session.get('cscid')
     current_month = datetime.now().strftime("%B")
     device_exists = DeviceFetch.objects.exists()
-    with open('mainapp/data/maintenance_downtime.txt', 'r') as file:
-            maintenance_info = file.read()
-    context = {'vle_name':vle_name, 'csc_id':csc_id, 'current_month':current_month,'device_exists':device_exists, 'maintenance_info':maintenance_info}
+    context = {'vle_name':vle_name, 'csc_id':csc_id, 'current_month':current_month,'device_exists':device_exists, 'maintenance_info':maintenance_info()}
     return render(request,'dashboarddigipay.html',context)
 
 def base2(request):
@@ -458,48 +473,49 @@ def logout_user(request):
     else:
         return HttpResponse('Invalid request method', status=404)
     
-# def saveauthdb(request):
-#     # data = json.loads(request.body)
-#     csc_id = request.session.get('csc_Id')
-#     # mac_address = data.get('mac_address')
-#     # ports = data['dev_infos']['ports']
-#     # ports_int = [int(port) for port in ports]
-#     csc_Id=csc_id,
-#     port=8080,
-#     status='okay',
-#     info='Ready',
-#     mi='dummy mi',
-#     dc='dummy dc',
-#     mac='dummy mac_address',
-#     purpose='testing2'
-#     device_exists = DeviceFetch.objects.exists()
-#     device, created = DeviceFetch.objects.get_or_create(
-#             id=1,  # Assuming there is only one entry in the table, so we use a fixed id
-#             defaults={
-#                 'port': port,
-#                 'status': status,
-#                 'info': info,
-#                 'dc': dc,
-#                 'mi': mi,
-#                 'mac': mac,
-#                 'csc_Id': csc_id,
-#                 'purpose': purpose
-#             }
-#         )
-
-#         # If the entry already existed, update its values with the new ones
-#     if not created:
-#         device.port = port
-#         device.status = status
-#         device.info = info
-#         device.dc = dc
-#         device.mi = mi
-#         device.mac = mac
-#         device.csc_Id = csc_id
-#         device.purpose = purpose
-#         device.save()
-#         return HttpResponse('updated {0}'.format(device_exists), status = 200)
-#     return HttpResponse('created', status = 200)
+def saveauthdb(request):
+    # data = json.loads(request.body)
+    csc_id = request.session.get('csc_Id')
+    # mac_address = data.get('mac_address')
+    # ports = data['dev_infos']['ports']
+    # ports_int = [int(port) for port in ports]
+    csc_Id=csc_id,
+    port=8080,
+    status='okay',
+    info='Ready',
+    mi='dummy mi',
+    dc='dummy dc',
+    mac='dummy mac_address',
+    purpose='testing2'
+    device_exists = DeviceFetch.objects.exists()
+    device, created = DeviceFetch.objects.get_or_create(
+            id=1,  # Assuming there is only one entry in the table, so we use a fixed id
+            defaults={
+                'port': port,
+                'status': status,
+                'info': info,
+                'dc': dc,
+                'mi': mi,
+                'mac': mac,
+                'csc_Id': csc_id,
+                'purpose': purpose
+            }
+        )
+    # If the entry already existed, update its values with the new ones
+    if not created:
+        device.port = port
+        device.status = status
+        device.info = info
+        device.dc = dc
+        device.mi = mi
+        device.mac = mac
+        device.csc_Id = csc_id
+        device.purpose = purpose
+        device.save()
+        # return HttpResponse('updated {0}'.format(device_exists), status = 200)
+        return redirect('bioauthVLE')
+    # return HttpResponse('created', status = 200)
+    return redirect('bioauthVLE')
 
 @access_token_required
 def mini_statement(request):
@@ -522,4 +538,7 @@ def base_receipt(request):
                }
     return render(request,'base_receipt.html',context)
 
-
+def maintenance_info():
+    with open('mainapp/data/maintenance_downtime.txt', 'r') as file:
+        maintenance_info = file.read()
+    return maintenance_info

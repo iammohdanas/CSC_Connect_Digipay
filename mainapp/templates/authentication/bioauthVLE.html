@@ -1,0 +1,59 @@
+{% extends "base2.html" %}
+{% load static %}
+{% block page-content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="col-xl-8 col-lg-7" style="max-width: 100%;">
+        <div class="card shadow mb-4" style="height:20rem">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">VLE Authentication</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-area" style="height: 30rem; margin: 20px auto; text-align: center;">
+                    {% if device_exists %}
+                        <button type="button" id="capture_button" onclick="capture_using_registered_device()" class="btn btn-primary btn-authenticate">Authenticate Merchant</button>
+                    {% else %}
+                        <button type="button" id="showModalBtn" class="btn btn-primary">Authenticate Merchant</button>
+                    {% endif %}
+                    &nbsp; &nbsp; <a href="{% url 'transactionform' %}"><button type="submit" id="proceed_button" class="btn btn-primary" disabled>Proceed</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">RDS Device Registration</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Your Device is Not Registered, Click to Register.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <a href="{% url 'authdevregister' %}" class="btn btn-primary">Register</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block jquery_script %}
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="{% static 'js/transactionform.js' %}"></script>
+<script src="{% static 'js/bioauth.js' %}"></script>
+<script>
+    $("#showModalBtn").click(function(){
+        $("#exampleModalCenter").modal('show');
+    });
+</script>
+{% endblock jquery_script %}
+{% endblock page-content %}

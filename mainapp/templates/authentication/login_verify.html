@@ -6,7 +6,6 @@
 <div class="container-fluid">
 
     <!-- Page Heading -->
-   
     <div class="col-xl-8 col-lg-7" style="max-width: 100%;">
         <div class="card shadow mb-4" style="height:20rem">
             <!-- Card Header - Dropdown -->
@@ -17,7 +16,7 @@
             <!-- Card Body -->
             <div class="card-body">
                 <div class="chart-area" style="height: 30rem;">
-                    <form id="verifyOTPForm" method="POST" action="{% url 'verify_otp' %}" style="width: 300px;">
+                    <form id="verifyOTPForm" method="POST" action="{% url 'verify_otp' %}" style="width: 300px; ">
                         {% csrf_token %}
                         <input type="text" id="otp" name="otp" placeholder="Enter OTP" style="margin-top: 20px;"><br><br>
                         <div class="small" id="verifyStatus" style="color: rgb(121, 12, 12); margin-bottom: 10px;">
